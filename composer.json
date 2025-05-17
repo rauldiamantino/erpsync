@@ -5,6 +5,10 @@
     "App\\": "src/"
     }
   },
+  "files": [
+    "src/Helpers/functions.php",
+    "src/config/constants.php"
+  ],
   "authors": [
     {
       "name": "Raul Diamantino",

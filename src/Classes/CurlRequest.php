@@ -1,0 +1,173 @@
+<?php
+
+namespace App\Classes;
+
+class CurlRequest
+{
+  public static function request(string $method, string $url, array $headers = [], $body = null, bool $isJson = true): array
+  {
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($method));
+
+    if (strtoupper($method) !== 'GET' and $body !== null) {
+
+      // Body
+      if ($isJson and is_array($body)) {
+        $body = json_encode($body);
+
+        $hasContentType = false;
+        foreach ($headers as $key => $value):
+
+          if (strtolower($key) === 'content-type') {
+            $hasContentType = true;
+            break;
+          }
+        endforeach;
+
+        if (! $hasContentType) {
+          $headers['Content-Type'] = 'application/json';
+        }
+      }
+
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+    }
+
+    // Header
+    if ($headers) {
+      $formattedHeaders = [];
+      foreach ($headers as $key => $value):
+        $formattedHeaders[] = "$key: $value";
+      endforeach;
+
+      curl_setopt($ch, CURLOPT_HTTPHEADER, $formattedHeaders);
+    }
+
+    $response = curl_exec($ch);
+    $error = curl_error($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    curl_close($ch);
+
+    // Try to decode JSON response
+    $decoded = json_decode($response, true);
+
+    if (json_last_error() === JSON_ERROR_NONE and is_array($decoded)) {
+      $response = $decoded;
+    }
+    else {
+      $response = $response;
+    }
+
+    self::logRequest([
+      'method' => $method,
+      'url' => $url,
+      'headers' => $headers,
+      'body' => $body,
+      'response' => $response,
+      'code' => $httpCode,
+      'error' => $error,
+    ]);
+
+    return $response;
+  }
+
+  public static function get(string $url, array $headers = [], array $queryParams = [], $body = null): array
+  {
+    if ($queryParams) {
+      $queryString = http_build_query($queryParams);
+
+      if (strpos($url, '?') === false) {
+        $url .= '?';
+      }
+      else {
+        $url .= '&';
+      }
+
+      $url .= $queryString;
+    }
+
+    return self::request('GET', $url, $headers, $body);
+  }
+
+  public static function post(string $url, array $headers = [], $body = null): array
+  {
+    return self::request('POST', $url, $headers, $body);
+  }
+
+  public static function put(string $url, array $headers = [], $body = null): array
+  {
+    return self::request('PUT', $url, $headers, $body);
+  }
+
+  public static function patch(string $url, array $headers = [], $body = null): array
+  {
+    return self::request('PATCH', $url, $headers, $body);
+  }
+
+  public static function delete(string $url, array $headers = []): array
+  {
+    return self::request('DELETE', $url, $headers);
+  }
+
+  private static function logRequest(array $data): void
+  {
+    $logDir = __DIR__ . '/../temp/logs/';
+    $logFile = $logDir . 'curl-' . date('Y-m-d') . '.log';
+
+    if (! is_dir($logDir)) {
+      mkdir($logDir, 0777, true);
+    }
+
+    $curlCmd = 'curl';
+
+    // Add method if not GET
+    if (strtoupper($data['method']) !== 'GET') {
+      $curlCmd .= ' -X ' . strtoupper($data['method']);
+    }
+
+    // Add headers
+    if ($data['headers']) {
+      foreach ($data['headers'] as $key => $value):
+        $curlCmd .= " -H '" . $key . ": " . $value . "'";
+      endforeach;
+    }
+
+    // Add body if exists and method supports it
+    if ($data['body'] and strtoupper($data['method']) !== 'GET') {
+      $body = $data['body'];
+
+      if (is_array($data['body'])) {
+        $body = json_encode($data['body'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      }
+
+      // Escape single quotes inside body
+      $bodyEscaped = str_replace("'", "'\\''", $body);
+
+      $curlCmd .= " --data '" . $bodyEscaped . "'";
+    }
+
+    // Add URL
+    $curlCmd .= " '" . $data['url'] . "'";
+
+    if (is_array($data['response'])) {
+      $responseText = json_encode($data['response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+    else {
+      $responseText = $data['response'];
+    }
+
+    // Log entry with timestamp and cURL command + pretty response
+    $logEntry = date('Y-m-d H:i:s') . " ------------------------------------------------------------------------------------------------------------\n\n";
+    $logEntry .= $curlCmd . "\n\n";
+    $logEntry .= 'Response: ' . $data['code'] . "\n\n" . $responseText . "\n\n";
+
+    if ($data['error']) {
+      $logEntry .= "Error: " . $data['error'] . "\n\n";
+    }
+
+    file_put_contents($logFile, $logEntry, FILE_APPEND);
+  }
+}
