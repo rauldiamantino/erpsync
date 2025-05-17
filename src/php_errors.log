@@ -1,0 +1,29 @@
+[17-May-2025 00:56:19 UTC] PHP Warning:  The magic method App\Classes\Database::__wakeup() must have public visibility in C:\Users\rauld\Projetos\erpsync\src\Classes\Database.php on line 58
+[17-May-2025 00:56:19 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Dotenv\Dotenv::createImutable() in C:\Users\rauld\Projetos\erpsync\src\Classes\Database.php:16
+Stack trace:
+#0 C:\Users\rauld\Projetos\erpsync\src\Classes\Database.php(43): App\Classes\Database->__construct()
+#1 C:\Users\rauld\Projetos\erpsync\src\index.php(7): App\Classes\Database::getInstance()
+#2 {main}
+  thrown in C:\Users\rauld\Projetos\erpsync\src\Classes\Database.php on line 16
+[17-May-2025 00:56:32 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Dotenv\Dotenv::createImutable() in C:\Users\rauld\Projetos\erpsync\src\Classes\Database.php:16
+Stack trace:
+#0 C:\Users\rauld\Projetos\erpsync\src\Classes\Database.php(43): App\Classes\Database->__construct()
+#1 C:\Users\rauld\Projetos\erpsync\src\index.php(7): App\Classes\Database::getInstance()
+#2 {main}
+  thrown in C:\Users\rauld\Projetos\erpsync\src\Classes\Database.php on line 16
+[17-May-2025 00:56:57 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "App\Classes\_DIR_" in C:\Users\rauld\Projetos\erpsync\src\Classes\Database.php:16
+Stack trace:
+#0 C:\Users\rauld\Projetos\erpsync\src\Classes\Database.php(43): App\Classes\Database->__construct()
+#1 C:\Users\rauld\Projetos\erpsync\src\index.php(7): App\Classes\Database::getInstance()
+#2 {main}
+  thrown in C:\Users\rauld\Projetos\erpsync\src\Classes\Database.php on line 16
+[17-May-2025 00:57:07 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "_DIR_" in C:\Users\rauld\Projetos\erpsync\src\index.php:3
+Stack trace:
+#0 {main}
+  thrown in C:\Users\rauld\Projetos\erpsync\src\index.php on line 3
+[17-May-2025 00:57:11 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "App\Classes\_DIR_" in C:\Users\rauld\Projetos\erpsync\src\Classes\Database.php:16
+Stack trace:
+#0 C:\Users\rauld\Projetos\erpsync\src\Classes\Database.php(43): App\Classes\Database->__construct()
+#1 C:\Users\rauld\Projetos\erpsync\src\index.php(7): App\Classes\Database::getInstance()
+#2 {main}
+  thrown in C:\Users\rauld\Projetos\erpsync\src\Classes\Database.php on line 16
