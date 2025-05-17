@@ -8,9 +8,7 @@ use App\Classes\Router;
 $url = $_SERVER['REQUEST_URI'];
 $router = new Router($url);
 
-$router->addRoute('sobre', 'About', 'index');
-$router->addRoute('contato/enviar', 'Contact', 'send');
-$router->addRoute('produtos/{id}', 'Product', 'show');
+$router->addRoute('/', 'Home', 'index');
 
 $router->dispatch();
 ?>

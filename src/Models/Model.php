@@ -91,6 +91,7 @@ abstract Class Model
 
     $fields = [];
     $placeholders = [];
+
     foreach ($data as $key => $value):
       $fields[] = $key;
       $placeholders[] = ':' . $key;
@@ -105,6 +106,38 @@ abstract Class Model
 
     $stmt = $this->database->prepare($sql);
 
+    return $stmt->execute($data);
+  }
+
+  public function createOrUpdate(array $data): bool
+  {
+    $this->checkTable();
+
+    $fields = [];
+    $placeholders = [];
+    $updateFields = [];
+
+    foreach ($data as $key => $value):
+      $fields[] = $key;
+      $placeholders[] = ':' . $key;
+
+      // Avoid updating primary key
+      if ($key !== 'id') {
+        $updateFields[] = $key . '= VALUES(' . $key . ')';
+      }
+    endforeach;
+
+    $fieldsString = implode(', ', $fields);
+    $placeholdersString = implode(', ', $placeholders);
+    $updateString = implode(', ', $updateFields);
+
+    $sql = <<<SQL
+  INSERT INTO {$this->table} ({$fieldsString})
+  VALUES ({$placeholdersString})
+  ON DUPLICATE KEY UPDATE {$updateString}
+  SQL;
+
+    $stmt = $this->database->prepare($sql);
     return $stmt->execute($data);
   }
 

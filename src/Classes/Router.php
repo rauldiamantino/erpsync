@@ -17,7 +17,7 @@ class Router
 
   public function addRoute(string $path, string $controller, string $method): void
   {
-    $this->routes[ $path ] = [
+    $this->routes[$path] = [
       'controller' => ucfirst($controller) . 'Controller',
       'method' => $method,
     ];
@@ -25,22 +25,30 @@ class Router
 
   public function dispatch(): void
   {
-    $segments = explode('/', $this->url);
-
-    $controllerName = ucfirst($segments[0] ?? '') . 'Controller';
-
-    if (empty($controllerName) or $controllerName === 'Controller') {
-      $controllerName = $this->defaultController;
+    if (isset($this->routes[$this->url])) {
+      $route = $this->routes[$this->url];
+      $controllerName = $route['controller'];
+      $method = $route['method'];
+      $params = [];
     }
+    else {
+      $segments = explode('/', $this->url);
 
-    $method = $segments[1] ?? $this->defaultMethod;
-    $params = array_slice($segments, 2);
+      $controllerName = ucfirst($segments[0] ?? '') . 'Controller';
+
+      if (empty($controllerName) or $controllerName === 'Controller') {
+        $controllerName = $this->defaultController;
+      }
+
+      $method = $segments[1] ?? $this->defaultMethod;
+      $params = array_slice($segments, 2);
+    }
 
     $controllerClass = $this->controllerNamespace . $controllerName;
 
     if (! class_exists($controllerClass)) {
       http_response_code(404);
-      echo "Controller not found.";
+      echo 'Controller not found.';
       exit;
     }
 
@@ -48,10 +56,10 @@ class Router
 
     if (! method_exists($controller, $method)) {
       http_response_code(404);
-      echo "Method not found.";
+      echo 'Method not found.';
       exit;
     }
 
-    call_user_func_array([ $controller, $method ], $params);
+    call_user_func_array([$controller, $method], $params);
   }
 }

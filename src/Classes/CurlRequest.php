@@ -15,20 +15,30 @@ class CurlRequest
     if (strtoupper($method) !== 'GET' and $body !== null) {
 
       // Body
-      if ($isJson and is_array($body)) {
-        $body = json_encode($body);
+      $hasContentType = false;
+      $contentType = 'application/json';
 
-        $hasContentType = false;
-        foreach ($headers as $key => $value):
+      foreach ($headers as $key => $value):
 
-          if (strtolower($key) === 'content-type') {
-            $hasContentType = true;
-            break;
-          }
-        endforeach;
+        if (strtolower($key) === 'content-type') {
+          $hasContentType = true;
+          $contentType = strtolower($value);
+          break;
+        }
+      endforeach;
 
-        if (! $hasContentType) {
-          $headers['Content-Type'] = 'application/json';
+      if (! $hasContentType) {
+        $headers['Content-Type'] = 'application/json';
+        $contentType = 'application/json';
+      }
+
+      if (is_array($body)) {
+
+        if ($contentType === 'application/json') {
+          $body = json_encode($body);
+        }
+        elseif ($contentType === 'application/x-www-form-urlencoded') {
+          $body = http_build_query($body);
         }
       }
 
@@ -39,7 +49,7 @@ class CurlRequest
     if ($headers) {
       $formattedHeaders = [];
       foreach ($headers as $key => $value):
-        $formattedHeaders[] = "$key: $value";
+        $formattedHeaders[] = $key . ': ' . $value;
       endforeach;
 
       curl_setopt($ch, CURLOPT_HTTPHEADER, $formattedHeaders);
@@ -74,7 +84,7 @@ class CurlRequest
     return $response;
   }
 
-  public static function get(string $url, array $headers = [], array $queryParams = [], $body = null): array
+  public static function get(string $url, array $headers = [], array $queryParams = null, $body = null): array
   {
     if ($queryParams) {
       $queryString = http_build_query($queryParams);
@@ -153,7 +163,7 @@ class CurlRequest
     $curlCmd .= " '" . $data['url'] . "'";
 
     if (is_array($data['response'])) {
-      $responseText = json_encode($data['response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+      $responseText = json_encode($data['response'], JSON_UNESCAPED_UNICODE);
     }
     else {
       $responseText = $data['response'];
