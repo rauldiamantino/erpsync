@@ -1,5 +1,8 @@
 <?php
 
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../../../');
+$dotenv->load();
+
 define('ACTIVE', 1);
 define('INACTIVE', 0);
 

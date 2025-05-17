@@ -49,6 +49,28 @@ abstract Class Model
     return $result;
   }
 
+  public function findBy(string $field, mixed $value): ?array
+  {
+    $this->checkTable();
+
+    $sql = <<<SQL
+  SELECT * FROM {$this->table} WHERE {$field} = :value LIMIT 1
+  SQL;
+
+    $data = [':value' => $value];
+    $stmt = $this->database->prepare($sql);
+    $stmt->execute($data);
+    $stmt->setFetchMode(\PDO::FETCH_ASSOC);
+
+    $result = $stmt->fetch();
+
+    if ($result === false) {
+      return null;
+    }
+
+    return $result;
+  }
+
   public function all(): array
   {
     $this->checkTable();

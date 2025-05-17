@@ -1,0 +1,1 @@
+<a href="<?php echo $blingAuthUrl; ?>" target="_blank">Bling connect</a>

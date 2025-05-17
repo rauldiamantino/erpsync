@@ -3,13 +3,14 @@
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../Helpers/functions.php';
 
-use App\Classes\CurlRequest;
+use App\Classes\Router;
 
-$headers = [
-  'Content-Type' => 'application/json',
-  'Authorization' => 'Bearer abc1234',
-];
+$url = $_SERVER['REQUEST_URI'];
+$router = new Router($url);
 
-$response = CurlRequest::get('https://jsonplaceholder.typicode.com/posts/10', $headers);
+$router->addRoute('sobre', 'About', 'index');
+$router->addRoute('contato/enviar', 'Contact', 'send');
+$router->addRoute('produtos/{id}', 'Product', 'show');
 
-pr($response);
+$router->dispatch();
+?>
