@@ -2,7 +2,6 @@
 
 namespace App\Controllers\Components;
 
-use Dotenv\Dotenv;
 use App\Classes\CurlRequest;
 
 Class BlingComponent
@@ -80,37 +79,17 @@ Class BlingComponent
       return $response;
     }
 
-    $missingFields = [];
-
-    if (! isset($response['access_token']) or empty($response['access_token'])) {
-      $missingFields[] = 'access_token';
-    }
-
-    if (! isset($response['expires_in']) or empty($response['expires_in'])) {
-      $missingFields[] = 'expires_in';
-    }
-
-    if (! isset($response['refresh_token']) or empty($response['refresh_token'])) {
-      $missingFields[] = 'refresh_token';
-    }
-
-    if ($missingFields) {
-      return ['error' => 'Incomplete response from Bling API. Missing fields: ' . implode(', ', $missingFields)];
-    }
-
-    $this->persistTokens($response);
-
-    return ['ok' => true, 'message' => ''];
+    return $this->persistTokens($response);
   }
 
-  public function renewToken(): array
+  private function renewToken(): array
   {
     if (empty($this->refreshToken)) {
       return ['error' => 'Invalid refresh token.'];
     }
 
     if ($this->expiresToken > time() + 60) {
-      return ['ok' => true, 'message' => 'Token is still valid.'];
+      return ['success' => true, 'message' => 'Token is still valid.'];
     }
 
     $url = $this->baseUrl . '/oauth/token';
@@ -136,6 +115,11 @@ Class BlingComponent
       return $response;
     }
 
+    return $this->persistTokens($response);
+  }
+
+  private function persistTokens(array $response): array
+  {
     $missingFields = [];
 
     if (! isset($response['access_token']) or empty($response['access_token'])) {
@@ -154,13 +138,6 @@ Class BlingComponent
       return ['error' => 'Incomplete response from Bling API. Missing fields: ' . implode(', ', $missingFields)];
     }
 
-    $this->persistTokens($response);
-
-    return ['ok' => true, 'message' => ''];
-  }
-
-  private function persistTokens(array $response): void
-  {
     // Set tokens for immediate use
     $this->accessToken = $response['access_token'];
     $this->refreshToken = $response['refresh_token'];
@@ -169,5 +146,7 @@ Class BlingComponent
     setSetting('bling_access_token', $this->accessToken);
     setSetting('bling_refresh_token', $this->refreshToken);
     setSetting('bling_expires_in', $this->expiresToken);
+
+    return ['success' => true, 'message' => ''];
   }
 }

@@ -2,7 +2,9 @@
 
 namespace App\Controllers;
 
+use App\Controllers\Components\BlingProductSchedulerComponent;
 use App\Controllers\Controller;
+use App\Models\QueueModel;
 
 class TestController extends Controller
 {
@@ -20,8 +22,10 @@ class TestController extends Controller
     $this->view->assign('title', "Page's Tests");
     $this->view->render('index');
 
-    $test = ['testing'];
+    $queueModel = new QueueModel();
+    $blingScheduleSync = new BlingProductSchedulerComponent($queueModel);
+    $result = $blingScheduleSync->scheduleSync();
 
-    pr($test);
+    pr($result);
   }
 }

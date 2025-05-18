@@ -12,4 +12,16 @@ class QueueModel extends Model
 
     $this->setTable('queue');
   }
+
+  public function scheduleQueue(int $type, int $service, int $reference_id): void
+  {
+    $data = [
+      'type' => (int) $type,
+      'service' => (int) $service,
+      'reference_id' => (int) $reference_id,
+      'attempts' => 0,
+    ];
+
+    $this->createOrUpdate($data);
+  }
 }
