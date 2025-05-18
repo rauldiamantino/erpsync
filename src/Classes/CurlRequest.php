@@ -4,6 +4,27 @@ namespace App\Classes;
 
 class CurlRequest
 {
+
+  public static function post(string $url, array $headers = [], $body = null): array
+  {
+    return self::request('POST', $url, $headers, $body);
+  }
+
+  public static function put(string $url, array $headers = [], $body = null): array
+  {
+    return self::request('PUT', $url, $headers, $body);
+  }
+
+  public static function patch(string $url, array $headers = [], $body = null): array
+  {
+    return self::request('PATCH', $url, $headers, $body);
+  }
+
+  public static function delete(string $url, array $headers = []): array
+  {
+    return self::request('DELETE', $url, $headers);
+  }
+
   public static function request(string $method, string $url, array $headers = [], $body = null, bool $isJson = true): array
   {
     $ch = curl_init();
@@ -100,26 +121,6 @@ class CurlRequest
     }
 
     return self::request('GET', $url, $headers, $body);
-  }
-
-  public static function post(string $url, array $headers = [], $body = null): array
-  {
-    return self::request('POST', $url, $headers, $body);
-  }
-
-  public static function put(string $url, array $headers = [], $body = null): array
-  {
-    return self::request('PUT', $url, $headers, $body);
-  }
-
-  public static function patch(string $url, array $headers = [], $body = null): array
-  {
-    return self::request('PATCH', $url, $headers, $body);
-  }
-
-  public static function delete(string $url, array $headers = []): array
-  {
-    return self::request('DELETE', $url, $headers);
   }
 
   private static function logRequest(array $data): void

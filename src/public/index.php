@@ -11,4 +11,3 @@ $router = new Router($url);
 $router->addRoute('/', 'Home', 'index');
 
 $router->dispatch();
-?>
