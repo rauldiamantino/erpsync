@@ -6,17 +6,17 @@ use App\Classes\Constants\ServiceType;
 use App\Classes\Constants\ReferenceType;
 
 use App\Controllers\Components\BlingComponent;
-use App\Models\QueueModel;
+use App\Models\ScheduleModel;
 
-Class BlingProductSchedulerComponent extends BlingComponent
+class BlingProductSchedulerComponent extends BlingComponent
 {
-  private QueueModel $queueModel;
+  private ScheduleModel $scheduleModel;
 
-  public function __construct(QueueModel $queueModel)
+  public function __construct(ScheduleModel $scheduleModel)
   {
     parent::__construct();
 
-    $this->queueModel = $queueModel;
+    $this->scheduleModel = $scheduleModel;
   }
 
   public function scheduleSync(): array
@@ -97,7 +97,7 @@ Class BlingProductSchedulerComponent extends BlingComponent
     }
 
     foreach ($productsIds as $productId):
-      $this->queueModel->scheduleQueue(ReferenceType::PRODUCT, ServiceType::BLING, $productId);
+      $this->scheduleModel->scheduleQueue(ReferenceType::PRODUCT, ServiceType::BLING, $productId);
     endforeach;
 
     return count($productsIds);

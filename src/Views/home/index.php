@@ -1,1 +1,0 @@
-<a href="<?php echo $blingAuthUrl; ?>" target="_blank" class="hover:underline text-blue-700">Bling - Receive products</a>

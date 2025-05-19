@@ -3,8 +3,9 @@
 namespace App\Controllers;
 
 use App\Classes\View;
+use App\Helpers\Flash;
 
-Class Controller
+class Controller
 {
   protected $view;
   protected $folder;
@@ -16,5 +17,15 @@ Class Controller
 
     $this->view->setLayout($this->layout);
     $this->view->setFolder($this->folder);
+  }
+
+  protected function redirect(string $url, string $type = null, string $message = null): void
+  {
+    if ($type) {
+      Flash::set($type, $message);
+    }
+
+    header('Location: ' . $url);
+    exit;
   }
 }

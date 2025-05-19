@@ -5,7 +5,7 @@ namespace App\Models;
 use PDO;
 use App\Classes\Database;
 
-abstract Class Model
+abstract class Model
 {
   protected string $table;
   protected PDO $database;

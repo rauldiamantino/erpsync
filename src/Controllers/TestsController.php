@@ -4,10 +4,10 @@ namespace App\Controllers;
 
 use App\Controllers\Controller;
 
-class HomeController extends Controller
+class TestsController extends Controller
 {
-  protected $layout = 'default';
-  protected $folder = 'home';
+  protected $folder = 'tests';
+  protected $layout = 'tests';
 
   public function __construct()
   {
@@ -16,7 +16,9 @@ class HomeController extends Controller
 
   public function index(): void
   {
-    $this->view->assign('title', 'Home');
+    $this->view->assign('result', $result ?? []);
+
+    $this->view->assign('title', 'Page\'s Tests');
     $this->view->render('index');
   }
 }

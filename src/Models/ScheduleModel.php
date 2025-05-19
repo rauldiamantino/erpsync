@@ -4,13 +4,13 @@ namespace App\Models;
 
 use App\Models\Model;
 
-class QueueModel extends Model
+class ScheduleModel extends Model
 {
   public function __construct()
   {
     parent::__construct();
 
-    $this->setTable('queue');
+    $this->setTable('schedules');
   }
 
   public function scheduleQueue(int $type, int $service, int $reference_id): void

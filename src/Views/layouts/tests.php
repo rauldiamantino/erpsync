@@ -8,7 +8,7 @@
   </head>
   <body class="bg-black min-h-screen flex flex-col">
     <header class="p-4 border-b border-gray-300">
-      <h1 class="text-xl text-gray-200">ErpSync's Test</h1>
+      <h1 class="text-xl text-gray-200">ErpSync's Tests</h1>
     </header>
     <main class="w-full p-4">
       <div class="text-gray-200">

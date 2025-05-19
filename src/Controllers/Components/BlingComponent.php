@@ -4,7 +4,7 @@ namespace App\Controllers\Components;
 
 use App\Classes\CurlRequest;
 
-Class BlingComponent
+class BlingComponent
 {
   private string $baseUrl;
   private string $clientId;

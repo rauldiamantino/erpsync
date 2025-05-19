@@ -4,7 +4,7 @@ namespace App\Controllers\Components;
 
 use App\Controllers\Components\BlingComponent;
 
-Class BlingProductSyncComponent extends BlingComponent
+class BlingProductSyncComponent extends BlingComponent
 {
   public function syncToEcommerce(int $id): array
   {
