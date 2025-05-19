@@ -29,6 +29,7 @@ class IntegrationTasksController extends Controller
     $integrationTasks = $this->integrationTaskModel->all();
 
     foreach ($integrationTasks as $key => $value):
+      $integrationTasks[ $key ]['type'] = $this->getReferenceName($value['type']);
       $integrationTasks[ $key ]['service'] = $this->getServiceName($value['service']);
     endforeach;
 
@@ -38,15 +39,6 @@ class IntegrationTasksController extends Controller
     $this->view->assign('blingUrls', $blingUrls);
     $this->view->assign('integrationTasks', $integrationTasks);
     $this->view->render('index');
-  }
-
-  private function getServiceName(?int $serviceType): string
-  {
-    $services = [
-      ServiceType::BLING => 'Bling',
-    ];
-
-    return $services[ $serviceType ] ?? 'Desconhecido';
   }
 
   private function getServiceUrls(int $serviceType): array

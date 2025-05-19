@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Classes\View;
 use App\Helpers\Flash;
+use App\Classes\Constants\ServiceType;
+use App\Classes\Constants\ReferenceType;
 
 class Controller
 {
@@ -27,5 +29,27 @@ class Controller
 
     header('Location: ' . $url);
     exit;
+  }
+
+  protected function getServiceName(?int $serviceType): string
+  {
+    $services = [
+      ServiceType::BLING => 'Bling',
+    ];
+
+    return $services[ $serviceType ] ?? 'Desconhecido';
+  }
+
+  protected function getReferenceName(?int $referenceType): string
+  {
+    $referencesTypes = [
+      ReferenceType::PRODUCT => 'Produto',
+      ReferenceType::SKU => 'Sku',
+      ReferenceType::CATEGORY => 'Categoria',
+      ReferenceType::BRAND => 'Marca',
+      ReferenceType::STOCK => 'Estoque',
+    ];
+
+    return $referencesTypes[ $referenceType ] ?? 'Desconhecido';
   }
 }
