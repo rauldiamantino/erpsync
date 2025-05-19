@@ -17,7 +17,10 @@ class Router
 
   public function addRoute(string $path, string $controller, string $method): void
   {
-    $this->routes[$path] = [
+    // Changes snake_case ControllerName to camelCase
+    $controller = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $controller))));
+
+    $this->routes[ $path ] = [
       'controller' => ucfirst($controller) . 'Controller',
       'method' => $method,
     ];
@@ -25,14 +28,17 @@ class Router
 
   public function dispatch(): void
   {
-    if (isset($this->routes[$this->url])) {
-      $route = $this->routes[$this->url];
+    if (isset($this->routes[ $this->url ])) {
+      $route = $this->routes[ $this->url ];
       $controllerName = $route['controller'];
       $method = $route['method'];
       $params = [];
     }
     else {
       $segments = explode('/', $this->url);
+
+      // Changes snake_case ControllerName to camelCase
+      $segments[0] = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $segments[0]))));
 
       $controllerName = ucfirst($segments[0] ?? '') . 'Controller';
 

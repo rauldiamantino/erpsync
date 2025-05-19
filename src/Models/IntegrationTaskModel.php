@@ -4,16 +4,16 @@ namespace App\Models;
 
 use App\Models\Model;
 
-class ScheduleModel extends Model
+class IntegrationTaskModel extends Model
 {
   public function __construct()
   {
     parent::__construct();
 
-    $this->setTable('schedules');
+    $this->setTable('integration_tasks');
   }
 
-  public function scheduleQueue(int $type, int $service, int $reference_id): void
+  public function scheduleTask(int $type, int $service, int $reference_id): void
   {
     $data = [
       'type' => (int) $type,

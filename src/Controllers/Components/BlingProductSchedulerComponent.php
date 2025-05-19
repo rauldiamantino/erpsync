@@ -6,17 +6,17 @@ use App\Classes\Constants\ServiceType;
 use App\Classes\Constants\ReferenceType;
 
 use App\Controllers\Components\BlingComponent;
-use App\Models\ScheduleModel;
+use App\Models\IntegrationTaskModel;
 
 class BlingProductSchedulerComponent extends BlingComponent
 {
-  private ScheduleModel $scheduleModel;
+  private IntegrationTaskModel $integrationTaskModel;
 
-  public function __construct(ScheduleModel $scheduleModel)
+  public function __construct(IntegrationTaskModel $integrationTaskModel)
   {
     parent::__construct();
 
-    $this->scheduleModel = $scheduleModel;
+    $this->integrationTaskModel = $integrationTaskModel;
   }
 
   public function scheduleSync(): array
@@ -47,7 +47,7 @@ class BlingProductSchedulerComponent extends BlingComponent
 
     return [
       'success' => true,
-      'total_scheduled' => $this->scheduleQueue($productsIds),
+      'total_scheduled' => $this->scheduleTask($productsIds),
     ];
   }
 
@@ -90,14 +90,14 @@ class BlingProductSchedulerComponent extends BlingComponent
     return $productsIds;
   }
 
-  private function scheduleQueue(array $productsIds): int
+  private function scheduleTask(array $productsIds): int
   {
     if (empty($productsIds)) {
       return 0;
     }
 
     foreach ($productsIds as $productId):
-      $this->scheduleModel->scheduleQueue(ReferenceType::PRODUCT, ServiceType::BLING, $productId);
+      $this->integrationTaskModel->scheduleTask(ReferenceType::PRODUCT, ServiceType::BLING, $productId);
     endforeach;
 
     return count($productsIds);

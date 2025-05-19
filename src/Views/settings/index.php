@@ -26,7 +26,7 @@
       </tr>
     </thead>
     <tbody class="divide-y divide-gray-200 bg-white">
-      <?php foreach ($schedules as $value): ?>
+      <?php foreach ($integrationTasks as $value): ?>
         <tr>
           <td class="px-4 py-2 text-sm text-gray-700"><?php echo $value['id'] ?? ''; ?></td>
           <td class="px-4 py-2 text-sm text-gray-700"><?php echo $value['type'] ?? ''; ?></td>

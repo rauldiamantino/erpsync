@@ -4,12 +4,12 @@ namespace App\Models;
 
 use App\Models\Model;
 
-class TransmissionModel extends Model
+class IntegrationLogModel extends Model
 {
   public function __construct()
   {
     parent::__construct();
 
-    $this->setTable('transmissions');
+    $this->setTable('integration_logs');
   }
 }
