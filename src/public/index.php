@@ -8,7 +8,5 @@ use App\Classes\Router;
 $url = $_SERVER['REQUEST_URI'];
 $router = new Router($url);
 
-$router->addRoute('/', 'Home', 'index');
-
 $router->dispatch();
 ?>

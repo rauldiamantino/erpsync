@@ -18,14 +18,13 @@ class TestController extends Controller
 
   public function index(): void
   {
-    // Always render before testing
-    $this->view->assign('title', "Page's Tests");
-    $this->view->render('index');
-
     $queueModel = new QueueModel();
     $blingScheduleSync = new BlingProductSchedulerComponent($queueModel);
-    $result = $blingScheduleSync->scheduleSync();
 
-    pr($result);
+    $result = $blingScheduleSync->scheduleSync();
+    $this->view->assign('result', $result);
+
+    $this->view->assign('title', 'Page\'s Tests');
+    $this->view->render('index');
   }
 }

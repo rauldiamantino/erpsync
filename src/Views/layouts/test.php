@@ -6,12 +6,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title><?php echo $title ?? 'Meu Site'; ?></title>
   </head>
-  <body class="min-h-screen flex flex-col">
+  <body class="bg-black min-h-screen flex flex-col">
     <header class="p-4 border-b border-gray-300">
-      <h1 class="text-xl">ErpSync's Test</h1>
+      <h1 class="text-xl text-gray-200">ErpSync's Test</h1>
     </header>
     <main class="w-full p-4">
-      <div>
+      <div class="text-gray-200">
         <?php echo $content; ?>
       </div>
     </main>
