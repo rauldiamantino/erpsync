@@ -8,7 +8,7 @@ use App\Classes\Constants\ReferenceType;
 use App\Controllers\Components\BlingComponent;
 use App\Models\IntegrationTaskModel;
 
-class BlingProductSchedulerComponent extends BlingComponent
+class BlingCategorySchedulerComponent extends BlingComponent
 {
   private IntegrationTaskModel $integrationTaskModel;
 
@@ -22,24 +22,22 @@ class BlingProductSchedulerComponent extends BlingComponent
   public function scheduleSync(): array
   {
     $page = 1;
-    $productsIds = [];
+    $categoriesIds = [];
 
     do {
       $queryParams = [
         'pagina' => $page,
         'limite' => 100,
-        'tipo' => 'P',
-        'criterio' => 5,
       ];
 
-      $response = $this->fetchAllBlingProduct($queryParams);
+      $response = $this->fetchAllBlingCategory($queryParams);
 
       if (isset($response['error'])) {
         return $response;
       }
 
-      $extractIds = $this->extractProductIds($response);
-      $productsIds += $extractIds;
+      $extractIds = $this->extractCategoryIds($response);
+      $categoriesIds += $extractIds;
 
       $page++;
     }
@@ -47,21 +45,21 @@ class BlingProductSchedulerComponent extends BlingComponent
 
     return [
       'success' => true,
-      'total_scheduled' => $this->scheduleTask($productsIds),
+      'total_scheduled' => $this->scheduleTask($categoriesIds),
     ];
   }
 
-  private function fetchAllBlingProduct(array $queryParams): array
+  private function fetchAllBlingCategory(array $queryParams): array
   {
     $headers = [
       'Content-Type' => 'application/json',
       'Accept' => 'application/json',
     ];
 
-    $response = $this->sendRequest('get', '/produtos', $headers, null, $queryParams);
+    $response = $this->sendRequest('get', '/categorias/produtos', $headers, null, $queryParams);
 
     if (! is_array($response) or empty($response)) {
-      return ['error' => 'Failed to get all products'];
+      return ['error' => 'Failed to get all categories'];
     }
 
     if (isset($response['error']) and $response['error']) {
@@ -69,37 +67,36 @@ class BlingProductSchedulerComponent extends BlingComponent
     }
 
     if (! isset($response['data'][0]['id'])) {
-      return ['error' => 'Products not found'];
+      return ['error' => 'Categories not found'];
     }
 
     return $response['data'];
   }
 
-  private function extractProductIds(array $response): array
+  private function extractCategoryIds(array $response): array
   {
-    $productsIds = [];
+    $categoriesIds = [];
     foreach ($response as $value):
       $id = $value['id'] ?? '';
-      $situation = $value['situacao'] ?? '';
 
-      if ($id and in_array($situation, ['A', 'I'])) {
-        $productsIds[ $id ] = (int) $id;
+      if ($id) {
+        $categoriesIds[ $id ] = (int) $id;
       }
     endforeach;
 
-    return $productsIds;
+    return $categoriesIds;
   }
 
-  private function scheduleTask(array $productsIds): int
+  private function scheduleTask(array $categoriesIds): int
   {
-    if (empty($productsIds)) {
+    if (empty($categoriesIds)) {
       return 0;
     }
 
-    foreach ($productsIds as $productId):
-      $this->integrationTaskModel->scheduleTask(ReferenceType::PRODUCT, ServiceType::BLING, $productId);
+    foreach ($categoriesIds as $categoryId):
+      $this->integrationTaskModel->scheduleTask(ReferenceType::CATEGORY, ServiceType::BLING, $categoryId);
     endforeach;
 
-    return count($productsIds);
+    return count($categoriesIds);
   }
 }

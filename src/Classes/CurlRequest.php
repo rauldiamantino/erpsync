@@ -57,8 +57,7 @@ class CurlRequest
 
         if ($contentType === 'application/json') {
           $body = json_encode($body);
-        }
-        elseif ($contentType === 'application/x-www-form-urlencoded') {
+        } elseif ($contentType === 'application/x-www-form-urlencoded') {
           $body = http_build_query($body);
         }
       }
@@ -87,8 +86,7 @@ class CurlRequest
 
     if (json_last_error() === JSON_ERROR_NONE and is_array($decoded)) {
       $response = $decoded;
-    }
-    else {
+    } else {
       $response = $response;
     }
 
@@ -112,8 +110,7 @@ class CurlRequest
 
       if (strpos($url, '?') === false) {
         $url .= '?';
-      }
-      else {
+      } else {
         $url .= '&';
       }
 
@@ -128,26 +125,26 @@ class CurlRequest
     $logDir = __DIR__ . '/../temp/logs/';
     $logFile = $logDir . 'curl-' . date('Y-m-d') . '.log';
 
-    if (! is_dir($logDir)) {
+    if (!is_dir($logDir)) {
       mkdir($logDir, 0777, true);
     }
 
-    $curlCmd = 'curl';
+    $curlCmd = "curl";
 
     // Add method if not GET
     if (strtoupper($data['method']) !== 'GET') {
-      $curlCmd .= ' -X ' . strtoupper($data['method']);
+      $curlCmd .= " -X " . strtoupper($data['method']);
     }
 
     // Add headers
     if ($data['headers']) {
-      foreach ($data['headers'] as $key => $value):
-        $curlCmd .= " -H '" . $key . ": " . $value . "'";
-      endforeach;
+      foreach ($data['headers'] as $key => $value) {
+        $curlCmd .= " \\\n  -H '" . $key . ": " . $value . "'";
+      }
     }
 
     // Add body if exists and method supports it
-    if ($data['body'] and strtoupper($data['method']) !== 'GET') {
+    if ($data['body'] && strtoupper($data['method']) !== 'GET') {
       $body = $data['body'];
 
       if (is_array($data['body'])) {
@@ -157,25 +154,23 @@ class CurlRequest
       // Escape single quotes inside body
       $bodyEscaped = str_replace("'", "'\\''", $body);
 
-      $curlCmd .= " --data '" . $bodyEscaped . "'";
+      $curlCmd .= " \\\n  --data '" . $bodyEscaped . "'";
     }
 
     // Add URL
-    $curlCmd .= " '" . $data['url'] . "'";
+    $curlCmd .= " \\\n  '" . $data['url'] . "'";
 
-    if (is_array($data['response'])) {
-      $responseText = json_encode($data['response'], JSON_UNESCAPED_UNICODE);
-    }
-    else {
-      $responseText = $data['response'];
-    }
+    // Format response
+    $responseText = is_array($data['response'])
+      ? json_encode($data['response'], JSON_UNESCAPED_UNICODE)
+      : $data['response'];
 
-    // Log entry with timestamp and cURL command + pretty response
+    // Log entry
     $logEntry = date('Y-m-d H:i:s') . " ------------------------------------------------------------------------------------------------------------\n\n";
     $logEntry .= $curlCmd . "\n\n";
-    $logEntry .= 'Response: ' . $data['code'] . "\n\n" . $responseText . "\n\n";
+    $logEntry .= "Response: " . $data['code'] . "\n\n" . $responseText . "\n\n";
 
-    if ($data['error']) {
+    if (!empty($data['error'])) {
       $logEntry .= "Error: " . $data['error'] . "\n\n";
     }
 

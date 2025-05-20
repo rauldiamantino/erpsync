@@ -7,6 +7,7 @@ use App\Models\IntegrationTaskModel;
 use App\Controllers\Controller;
 use App\Classes\Constants\ServiceType;
 use App\Classes\Constants\TasksAction;
+use App\Controllers\Components\BlingCategorySchedulerComponent;
 use App\Controllers\Components\BlingProductSchedulerComponent;
 
 class IntegrationTasksController extends Controller
@@ -64,7 +65,15 @@ class IntegrationTasksController extends Controller
   public function categories(int $serviceType, int $taskStatus): void
   {
     if ($serviceType === ServiceType::BLING and $taskStatus === TasksAction::SEND) {
-      $this->redirect('/integration_tasks', 'success', '0 categorias recebidas');
+      $blingScheduleSync = new BlingCategorySchedulerComponent($this->integrationTaskModel);
+
+      $result = $blingScheduleSync->scheduleSync();
+
+      if (isset($result['error']) or ! isset($result['total_scheduled'])) {
+        $this->redirect('/integration_tasks', 'error', 'Não foi possível receber categorias');
+      }
+
+      $this->redirect('/integration_tasks', 'success', $result['total_scheduled'] . ' categorias recebidas');
     }
   }
 
