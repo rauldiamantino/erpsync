@@ -46,20 +46,12 @@ class IntegrationTasksController extends Controller
   {
     $servicesUrls = [
       ServiceType::BLING => [
-        ['url' => '/integration_tasks/suppliers/' . ServiceType::BLING . '/' . TasksAction::SEND, 'description' => 'Receber fornecedores'],
         ['url' => '/integration_tasks/categories/' . ServiceType::BLING . '/' . TasksAction::SEND, 'description' => 'Receber categorias'],
         ['url' => '/integration_tasks/products/' . ServiceType::BLING . '/' . TasksAction::SEND, 'description' => 'Receber produtos'],
       ],
     ];
 
     return $servicesUrls[ $serviceType ] ?? [];
-  }
-
-  public function suppliers(int $serviceType, int $taskStatus): void
-  {
-    if ($serviceType === ServiceType::BLING and $taskStatus === TasksAction::SEND) {
-      $this->redirect('/integration_tasks', 'success', '0 fornecedores recebidos');
-    }
   }
 
   public function categories(int $serviceType, int $taskStatus): void
