@@ -6,6 +6,11 @@ use App\Controllers\Components\BlingComponent;
 
 class BlingCategorySyncComponent extends BlingComponent
 {
+  public function __construct()
+  {
+    parent::__construct();
+  }
+
   public function syncToEcommerce(int $id): array
   {
     if (empty($id)) {
@@ -18,7 +23,22 @@ class BlingCategorySyncComponent extends BlingComponent
       return $response;
     }
 
-    return $response;
+    $category = [
+      'id' => intval($response['id'] ?? 0),
+      'name' => $response['descricao'] ?? '',
+      'parentId' => intval($response['categoriaPai']['id'] ?? 0),
+      'parentName' => '',
+    ];
+
+    $response = $this->getParentCategoryName($category);
+
+    if (isset($response['error'])) {
+      return $response;
+    }
+
+    $category['parentName'] = $response['descricao'] ?? '';
+
+    return $category;
   }
 
   private function fetchBlingCategory(int $id): array
@@ -43,5 +63,25 @@ class BlingCategorySyncComponent extends BlingComponent
     }
 
     return $response['data'];
+  }
+
+  private function getParentCategoryName(array $category): array
+  {
+    if (empty($category['parentId'])) {
+      return [];
+    }
+
+    $response = $this->fetchBlingCategory($category['parentId']);
+
+    if (isset($response['error'])) {
+      return [
+        'error' => [
+          'response' => $response['error'],
+          'obs' => 'Failed to get parent category name',
+        ],
+      ];
+    }
+
+    return $response;
   }
 }

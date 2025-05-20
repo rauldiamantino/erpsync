@@ -1,8 +1,19 @@
-<nav class="w-full flex justify-start gap-10 bg-white shadow-md p-4">
+<nav class="w-full flex justify-start gap-10 shadow-md p-4">
   <div class="max-w-7xl flex items-start gap-8">
-    <div class="text-xl font-bold text-gray-800">Bling</div>
+    <div class="text-xl font-bold text-gray-800">Receber <span class="text-base font-light italic">(ERP)</span></div>
     <ul class="space-y-2">
-      <?php foreach ($blingUrls as $value): ?>
+      <?php foreach ($receiveUrls as $value): ?>
+        <li class="text-gray-700 hover:text-blue-600 cursor-pointer">
+          <a href="<?php echo $value['url']; ?>"><?php echo $value['description']; ?></a>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  </div>
+
+  <div class="max-w-7xl flex items-start gap-8">
+    <div class="text-xl font-bold text-gray-800">Enviar <span class="text-base font-light italic">(Ecommerce)</span></div>
+    <ul class="space-y-2">
+      <?php foreach ($sendUrls as $value): ?>
         <li class="text-gray-700 hover:text-blue-600 cursor-pointer">
           <a href="<?php echo $value['url']; ?>"><?php echo $value['description']; ?></a>
         </li>
@@ -25,7 +36,7 @@
         <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Atualizado</th>
       </tr>
     </thead>
-    <tbody class="divide-y divide-gray-200 bg-white">
+    <tbody class="divide-y divide-gray-200">
       <?php foreach ($integrationTasks as $value): ?>
         <tr>
           <td class="px-4 py-2 text-sm text-gray-700"><?php echo $value['id'] ?? ''; ?></td>

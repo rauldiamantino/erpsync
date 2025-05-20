@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Classes\Constants\ReferenceType;
 use App\Helpers\Flash;
 use App\Models\IntegrationTaskModel;
 use App\Controllers\Controller;
@@ -9,6 +10,7 @@ use App\Classes\Constants\ServiceType;
 use App\Classes\Constants\TasksAction;
 use App\Controllers\Components\BlingCategorySchedulerComponent;
 use App\Controllers\Components\BlingProductSchedulerComponent;
+use App\Controllers\SyncController;
 
 class IntegrationTasksController extends Controller
 {
@@ -26,7 +28,9 @@ class IntegrationTasksController extends Controller
 
   public function index(): void
   {
-    $blingUrls = $this->getServiceUrls(ServiceType::BLING);
+    $receiveUrls = $this->getActionUrl(TasksAction::RECEIVE);
+    $sendUrls = $this->getActionUrl(TasksAction::SEND);
+
     $integrationTasks = $this->integrationTaskModel->all();
 
     foreach ($integrationTasks as $key => $value):
@@ -37,26 +41,31 @@ class IntegrationTasksController extends Controller
     $this->view->assign('title', 'Página Inicial');
     $this->view->assign('successMessage', Flash::get('success'));
     $this->view->assign('errorMessage', Flash::get('error'));
-    $this->view->assign('blingUrls', $blingUrls);
+    $this->view->assign('receiveUrls', $receiveUrls);
+    $this->view->assign('sendUrls', $sendUrls);
     $this->view->assign('integrationTasks', $integrationTasks);
     $this->view->render('index');
   }
 
-  private function getServiceUrls(int $serviceType): array
+  private function getActionUrl(int $taskAction): array
   {
-    $servicesUrls = [
-      ServiceType::BLING => [
-        ['url' => '/integration_tasks/categories/' . ServiceType::BLING . '/' . TasksAction::SEND, 'description' => 'Receber categorias'],
-        ['url' => '/integration_tasks/products/' . ServiceType::BLING . '/' . TasksAction::SEND, 'description' => 'Receber produtos'],
+    $taskActionUrls = [
+      TasksAction::RECEIVE => [
+        ['url' => '/integration_tasks/categories/' . ServiceType::BLING . '/' . TasksAction::RECEIVE, 'description' => 'Categorias'],
+        ['url' => '/integration_tasks/products/' . ServiceType::BLING . '/' . TasksAction::RECEIVE, 'description' => 'Produtos'],
+      ],
+      TasksAction::SEND => [
+        ['url' => '/integration_tasks/categories/' . ServiceType::BLING . '/' . TasksAction::SEND, 'description' => 'Categorias'],
+        ['url' => '/integration_tasks/products/' . ServiceType::BLING . '/' . TasksAction::SEND, 'description' => 'Produtos'],
       ],
     ];
 
-    return $servicesUrls[ $serviceType ] ?? [];
+    return $taskActionUrls[ $taskAction ] ?? [];
   }
 
   public function categories(int $serviceType, int $taskStatus): void
   {
-    if ($serviceType === ServiceType::BLING and $taskStatus === TasksAction::SEND) {
+    if ($serviceType === ServiceType::BLING and $taskStatus === TasksAction::RECEIVE) {
       $blingScheduleSync = new BlingCategorySchedulerComponent($this->integrationTaskModel);
 
       $result = $blingScheduleSync->scheduleSync();
@@ -67,11 +76,26 @@ class IntegrationTasksController extends Controller
 
       $this->redirect('/integration_tasks', 'success', $result['total_scheduled'] . ' categorias recebidas');
     }
+
+    if ($serviceType === ServiceType::BLING and $taskStatus === TasksAction::SEND) {
+      $syncController = new SyncController();
+
+      $result = $syncController->sync();
+
+      pr($result);
+      die;
+
+      if (isset($result['error']) or ! isset($result['total_synchronized'])) {
+        $this->redirect('/integration_tasks', 'error', 'Não foi possível enviar as categorias');
+      }
+
+      $this->redirect('/integration_tasks', 'success', 'Categorias enviadas');
+    }
   }
 
   public function products(int $serviceType, int $taskStatus): void
   {
-    if ($serviceType === ServiceType::BLING and $taskStatus === TasksAction::SEND) {
+    if ($serviceType === ServiceType::BLING and $taskStatus === TasksAction::RECEIVE) {
       $blingScheduleSync = new BlingProductSchedulerComponent($this->integrationTaskModel);
 
       $result = $blingScheduleSync->scheduleSync();
@@ -81,6 +105,10 @@ class IntegrationTasksController extends Controller
       }
 
       $this->redirect('/integration_tasks', 'success', $result['total_scheduled'] . ' produtos recebidos');
+    }
+
+    if ($serviceType === ServiceType::BLING and $taskStatus === TasksAction::SEND) {
+      $this->redirect('/integration_tasks', 'success', 'Produtos enviados');
     }
   }
 }

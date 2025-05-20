@@ -49,12 +49,12 @@ abstract class Model
     return $result;
   }
 
-  public function findBy(string $field, mixed $value): ?array
+  public function findBy(string $field, mixed $value, int $limit = 1): ?array
   {
     $this->checkTable();
 
     $sql = <<<SQL
-  SELECT * FROM {$this->table} WHERE {$field} = :value LIMIT 1
+  SELECT * FROM {$this->table} WHERE {$field} = :value LIMIT {$limit}
   SQL;
 
     $data = [':value' => $value];
@@ -62,7 +62,12 @@ abstract class Model
     $stmt->execute($data);
     $stmt->setFetchMode(\PDO::FETCH_ASSOC);
 
-    $result = $stmt->fetch();
+    if ($limit > 1) {
+      $result = $stmt->fetchAll();
+    }
+    else {
+      $result = $stmt->fetch();
+    }
 
     if ($result === false) {
       return null;
