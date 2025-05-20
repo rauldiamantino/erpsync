@@ -33,7 +33,7 @@ class CurlRequest
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($method));
 
-    if (strtoupper($method) !== 'GET' and $body !== null) {
+    if ($body !== null) {
 
       // Body
       $hasContentType = false;
@@ -144,7 +144,7 @@ class CurlRequest
     }
 
     // Add body if exists and method supports it
-    if ($data['body'] && strtoupper($data['method']) !== 'GET') {
+    if ($data['body']) {
       $body = $data['body'];
 
       if (is_array($data['body'])) {

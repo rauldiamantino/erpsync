@@ -37,7 +37,7 @@ class BlingComponent
     // Add bearer token to authorize the API request
     $headers['Authorization'] = 'Bearer ' . $this->accessToken;
 
-    // Respect Bling rate limit
+    // Respect rate limit
     sleep(1);
 
     return match ($method) {

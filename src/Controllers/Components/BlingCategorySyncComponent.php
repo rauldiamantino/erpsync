@@ -3,6 +3,7 @@
 namespace App\Controllers\Components;
 
 use App\Controllers\Components\BlingComponent;
+use App\Controllers\Components\BraavoCategoryComponent;
 
 class BlingCategorySyncComponent extends BlingComponent
 {
@@ -38,7 +39,11 @@ class BlingCategorySyncComponent extends BlingComponent
 
     $category['parentName'] = $response['descricao'] ?? '';
 
-    return $category;
+    $braavoComponent = new BraavoCategoryComponent();
+    $responsePlatform = $braavoComponent->sync($category);
+pr($responsePlatform);
+die;
+    return $responsePlatform;
   }
 
   private function fetchBlingCategory(int $id): array

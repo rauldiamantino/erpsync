@@ -42,6 +42,7 @@ class SyncController extends Controller
 
       if ($value['type'] === ReferenceType::CATEGORY) {
         $response = $blingCategorySync->syncToEcommerce($value['reference_id']);
+        die;
       }
       elseif ($value['type'] === ReferenceType::PRODUCT) {
         // $response = $blingProductSync->syncToEcommerce($value['reference_id']);

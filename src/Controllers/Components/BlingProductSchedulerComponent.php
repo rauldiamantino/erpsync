@@ -22,6 +22,7 @@ class BlingProductSchedulerComponent extends BlingComponent
   public function scheduleSync(): array
   {
     $page = 1;
+    $pageMax = 500;
     $productsIds = [];
 
     do {
@@ -43,7 +44,7 @@ class BlingProductSchedulerComponent extends BlingComponent
 
       $page++;
     }
-    while(count($response) === 100 and $page <= 500);
+    while(count($response) === 100 and $page <= $pageMax);
 
     return [
       'success' => true,
