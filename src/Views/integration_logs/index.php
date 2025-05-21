@@ -21,12 +21,12 @@
             <td class="px-4 py-2 text-sm text-gray-700 w-32"><?php echo $value['service'] ?? ''; ?></td>
             <td class="px-4 py-2 text-sm text-gray-700 w-40"><?php echo $value['reference_id'] ?? ''; ?></td>
             <td class="px-4 py-2 text-sm text-gray-700 align-top w-[500px]">
-              <div class="h-[150px] min-w-[400px] overflow-y-auto overflow-x-auto p-2 bg-gray-50 border border-gray-200 rounded text-xs">
+              <div class="h-[150px] min-w-[400px] overflow-y-auto overflow-x-auto p-2 bg-gray-200 border border-gray-200 rounded text-xs">
                 <pre class="whitespace-pre-wrap break-all"><?php echo htmlspecialchars($value['request_body'] ?? ''); ?></pre>
               </div>
             </td>
             <td class="px-4 py-2 text-sm text-gray-700 align-top w-[500px]">
-              <div class="h-[150px] min-w-[400px] overflow-y-auto overflow-x-auto p-2 bg-gray-50 border border-gray-200 rounded text-xs">
+              <div class="h-[150px] min-w-[400px] overflow-y-auto overflow-x-auto p-2 bg-gray-200 border border-gray-200 rounded text-xs">
                 <pre class="whitespace-pre-wrap break-all"><?php echo htmlspecialchars($value['response_body'] ?? ''); ?></pre>
               </div>
             </td>
