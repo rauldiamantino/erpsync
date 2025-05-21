@@ -2,7 +2,6 @@
 
 namespace App\Controllers;
 
-use App\Classes\Constants\ReferenceType;
 use App\Helpers\Flash;
 use App\Models\IntegrationTaskModel;
 use App\Controllers\Controller;
@@ -38,9 +37,10 @@ class IntegrationTasksController extends Controller
       $integrationTasks[ $key ]['service'] = $this->getServiceName($value['service']);
     endforeach;
 
-    $this->view->assign('title', 'Página Inicial');
+    $this->view->assign('title', 'Integration Tasks');
     $this->view->assign('successMessage', Flash::get('success'));
     $this->view->assign('errorMessage', Flash::get('error'));
+    $this->view->assign('neutralMessage', Flash::get('neutral'));
     $this->view->assign('receiveUrls', $receiveUrls);
     $this->view->assign('sendUrls', $sendUrls);
     $this->view->assign('integrationTasks', $integrationTasks);
@@ -71,10 +71,10 @@ class IntegrationTasksController extends Controller
       $result = $blingScheduleSync->scheduleSync();
 
       if (isset($result['error']) or ! isset($result['total_scheduled'])) {
-        $this->redirect('/integration_tasks', 'error', 'Não foi possível receber categorias');
+        $this->redirect('/integration_tasks', 'error', 'Unable to receive categories');
       }
 
-      $this->redirect('/integration_tasks', 'success', $result['total_scheduled'] . ' categorias recebidas');
+      $this->redirect('/integration_tasks', 'success', $result['total_scheduled'] . ' categories reiceved');
     }
 
     if ($serviceType === ServiceType::BLING and $taskStatus === TasksAction::SEND) {
@@ -82,14 +82,15 @@ class IntegrationTasksController extends Controller
 
       $result = $syncController->sync();
 
-      pr($result);
-      die;
-
-      if (isset($result['error']) or ! isset($result['total_synchronized'])) {
-        $this->redirect('/integration_tasks', 'error', 'Não foi possível enviar as categorias');
+      if (isset($result['error'])) {
+        $this->redirect('/integration_tasks', 'error', $result['error']);
       }
 
-      $this->redirect('/integration_tasks', 'success', 'Categorias enviadas');
+      if (isset($result['neutral'])) {
+        $this->redirect('/integration_tasks', 'neutral', $result['neutral']);
+      }
+
+      $this->redirect('/integration_tasks', 'success', $result['total_synchronized'] . ' categories submitted');
     }
   }
 
@@ -101,14 +102,18 @@ class IntegrationTasksController extends Controller
       $result = $blingScheduleSync->scheduleSync();
 
       if (isset($result['error']) or ! isset($result['total_scheduled'])) {
-        $this->redirect('/integration_tasks', 'error', 'Não foi possível receber produtos');
+        $this->redirect('/integration_tasks', 'error', 'Unable to receive products');
       }
 
-      $this->redirect('/integration_tasks', 'success', $result['total_scheduled'] . ' produtos recebidos');
+      if (isset($result['neutral'])) {
+        $this->redirect('/integration_tasks', 'neutral', $result['neutral']);
+      }
+
+      $this->redirect('/integration_tasks', 'success', $result['total_scheduled'] . ' products received');
     }
 
     if ($serviceType === ServiceType::BLING and $taskStatus === TasksAction::SEND) {
-      $this->redirect('/integration_tasks', 'success', 'Produtos enviados');
+      $this->redirect('/integration_tasks', 'success',  $result['total_synchronized'] . ' products submitted');
     }
   }
 }

@@ -2,51 +2,67 @@
 
 namespace App\Controllers;
 
-use App\Classes\Constants\ReferenceType;
-use App\Classes\Constants\ServiceType;
 use App\Controllers\Controller;
+use App\Models\IntegrationLogModel;
 use App\Models\IntegrationTaskModel;
+use App\Classes\Constants\ServiceType;
+use App\Classes\Constants\ReferenceType;
 use App\Controllers\Components\BlingCategorySyncComponent;
-use App\Controllers\Components\BlingProductSyncComponent;
 
 class SyncController extends Controller
 {
   protected $layout = false;
   protected $folder = false;
 
+  private $integrationLogModel;
   private $integrationTaskModel;
 
   public function __construct()
   {
     parent::__construct();
 
+    $this->integrationLogModel = new IntegrationLogModel();
     $this->integrationTaskModel = new IntegrationTaskModel();
   }
 
-  public function sync(int $id = 0)
+  public function sync()
   {
-    $resultTasks = $this->integrationTaskModel->all();
+    $resultTasks = $this->integrationTaskModel->findNextTask();
 
     if (empty($resultTasks)) {
-      return ['error' => 'Registros não encontrados'];
+      return ['neutral' => 'No records found'];
     }
 
-    $blingCategorySync = new BlingCategorySyncComponent();
-    $blingProductSync = new BlingProductSyncComponent();
+    $response = [];
 
-    foreach ($resultTasks as $value):
+    if ($resultTasks['service'] === ServiceType::BLING and $resultTasks['type'] === ReferenceType::CATEGORY) {
+      $response = (new BlingCategorySyncComponent())->syncToEcommerce($resultTasks['reference_id']);
+    }
 
-      if ($value['service'] !== ServiceType::BLING) {
-        continue;
-      }
+    if (empty($response)) {
+      return ['neutral' => 'No records found'];
+    }
 
-      if ($value['type'] === ReferenceType::CATEGORY) {
-        $response = $blingCategorySync->syncToEcommerce($value['reference_id']);
-        die;
-      }
-      elseif ($value['type'] === ReferenceType::PRODUCT) {
-        // $response = $blingProductSync->syncToEcommerce($value['reference_id']);
-      }
-    endforeach;
+    if (isset($response['error'])) {
+      $this->integrationTaskModel->update($resultTasks['id'], [
+        'attempts' => $resultTasks['attempts'] + 1,
+        'request_body' => json_encode($response['error']['request_body']),
+        'response_body' => json_encode($response['error']['response_body']),
+      ]);
+
+      return ['error' => 'It was not possible to send the registration ' . $resultTasks['id'] . ' to the platform'];
+    }
+
+    $this->integrationTaskModel->delete($resultTasks['id']);
+
+    $this->integrationLogModel->createOrUpdate([
+      'type' => $resultTasks['type'],
+      'service' => $resultTasks['service'],
+      'reference_id' => $resultTasks['reference_id'],
+      'request_body' => json_encode($response['success']['request_body']),
+      'response_body' => json_encode($response['success']['response_body']),
+    ]);
+
+    return ['success' => true, 'total_synchronized' => 1];
   }
 }

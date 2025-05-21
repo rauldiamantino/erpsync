@@ -25,7 +25,7 @@ class CurlRequest
     return self::request('DELETE', $url, $headers);
   }
 
-  public static function request(string $method, string $url, array $headers = [], $body = null, bool $isJson = true): array
+  public static function request(string $method, string $url, array $headers = [], $body = null, bool $isJson = true)
   {
     $ch = curl_init();
 

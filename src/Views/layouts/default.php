@@ -10,19 +10,25 @@
     <header class="p-4 border-b border-gray-300">
       <h1 class="text-xl">ErpSync</h1>
     </header>
-    <main class="relative w-full flex-1 p-4">
+    <main class="w-full flex-1 p-4">
 
       <?php if (isset($successMessage)) { ?>
-        <div class="absolute top-4 left-1/2 transform -translate-x-1/2 absolute w-max bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded" role="alert">
-          <strong class="font-bold">Sucesso!</strong>
+        <div class="w-full bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded" role="alert">
+          <strong class="font-bold">Success!</strong>
           <span class="block sm:inline"><?php echo $successMessage; ?></span>
         </div>
       <?php } ?>
 
       <?php if (isset($errorMessage)) { ?>
-        <div class="absolute top-4 left-1/2 transform -translate-x-1/2 absolute w-max bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">
-          <strong class="font-bold">Erro!</strong>
+        <div class="w-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">
+          <strong class="font-bold">Error!</strong>
           <span class="block sm:inline"><?php echo $errorMessage; ?></span>
+        </div>
+      <?php } ?>
+
+      <?php if (isset($neutralMessage)) { ?>
+        <div class="w-full bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded" role="alert">
+          <span class="block sm:inline"><?php echo $neutralMessage; ?></span>
         </div>
       <?php } ?>
 

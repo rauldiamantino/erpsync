@@ -15,7 +15,7 @@ class BlingCategorySyncComponent extends BlingComponent
   public function syncToEcommerce(int $id): array
   {
     if (empty($id)) {
-      return ['error' => 'Empty category ID'];
+      return ['error' => ['request_body' => [], 'response_body' => 'Empty category ID']];
     }
 
     $response = $this->fetchBlingCategory($id);
@@ -34,16 +34,19 @@ class BlingCategorySyncComponent extends BlingComponent
     $response = $this->getParentCategoryName($category);
 
     if (isset($response['error'])) {
-      return $response;
+      return ['error' => ['request_body' => $category, 'response_body' => $response]];
     }
 
     $category['parentName'] = $response['descricao'] ?? '';
 
     $braavoComponent = new BraavoCategoryComponent();
     $responsePlatform = $braavoComponent->sync($category);
-pr($responsePlatform);
-die;
-    return $responsePlatform;
+
+    if (isset($responsePlatform['error'])) {
+      return ['error' => ['request_body' => $category, 'response_body' => $responsePlatform]];
+    }
+
+    return ['success' => ['request_body' => $category, 'response_body' => $responsePlatform]];
   }
 
   private function fetchBlingCategory(int $id): array
@@ -79,12 +82,7 @@ die;
     $response = $this->fetchBlingCategory($category['parentId']);
 
     if (isset($response['error'])) {
-      return [
-        'error' => [
-          'response' => $response['error'],
-          'obs' => 'Failed to get parent category name',
-        ],
-      ];
+      return ['error' => ['response' => $response['error'], 'obs' => 'Failed to get parent category name']];
     }
 
     return $response;

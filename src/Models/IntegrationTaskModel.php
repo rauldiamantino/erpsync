@@ -24,4 +24,24 @@ class IntegrationTaskModel extends Model
 
     $this->createOrUpdate($data);
   }
+
+  public function findNextTask(): mixed
+  {
+    $sql = <<<SQL
+  SELECT * FROM {$this->table} WHERE `attempts` < :attempts ORDER BY `id` ASC LIMIT :limit
+  SQL;
+
+    $data = [
+      ':attempts' => 3,
+      ':limit' => 1,
+    ];
+
+    $result = $this->executeQuery($sql, $data);
+
+    if (is_array($result)) {
+      $result = $result[0];
+    }
+
+    return $result;
+  }
 }

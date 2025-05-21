@@ -59,21 +59,19 @@ class BraavoCategoryComponent extends BraavoComponent
     }
     while(count($response) === 100 and $page <= $pageMax);
 
-    $parentId = '0';
-    $categoryId = '0';
+    $parentName = $data['parentName'];
+    $result = $this->createParentCategory($parentName, $categoriesIds);
 
-    if ($data['parentName'] and ! isset($categoriesIds[ $data['parentName'] ])) {
-      $response = $this->createCategory($data);
-
-      if (isset($response['error'])) {
-        return $response;
-      }
-
-      $parentId = $response['id'];
+    if (isset($result['error'])) {
+      return $result;
     }
 
-    if (! isset($categoriesIds[ $data['name'] ])) {
-      $response = $this->createCategory($data, $parentId);
+    $categoryName = $data['name'];
+    $categoryId = $categoriesIds[ $data['name'] ] ?? '0';
+    $parentId = $result['parentId'] ?? '0';
+
+    if (empty($categoryId)) {
+      $response = $this->createCategory($categoryName, $parentId);
 
       if (isset($response['error'])) {
         return $response;
@@ -83,17 +81,14 @@ class BraavoCategoryComponent extends BraavoComponent
     }
 
     if ($parentId and $categoryId) {
-      $response = $this->updateCategoryLink($parentId, $categoryId);
+      $response = $this->updateCategoryLink($categoryId, $parentId);
 
       if (isset($response['error'])) {
         return $response;
       }
     }
 
-    return [
-      'success' => true,
-      'categoryId' => $categoryId,
-    ];
+    return ['success' => true, 'parentId' => $parentId, 'parentName' => $parentName, 'categoryId' => $categoryId, 'categoryName' => $categoryName];
   }
 
   private function fetchAllBraavoCategory(array $body): array
@@ -135,7 +130,30 @@ class BraavoCategoryComponent extends BraavoComponent
     return $categoriesIds;
   }
 
-  private function createCategory(array $data, string $parentId = '0'): array
+  private function createParentCategory(string $parentName, array $categoriesIds): array
+  {
+    if (empty($parentName)) {
+      return [];
+    }
+
+    $parentId = $categoriesIds[ $parentName ] ?? '0';
+    $parentId = (string) $parentId;
+
+
+    if ($parentId) {
+      return ['parentId' => $parentId ];
+    }
+
+    $response = $this->createCategory($parentName);
+
+    if (isset($response['error'])) {
+      return $response;
+    }
+
+    return ['parentId' => $response['id'] ];
+  }
+
+  private function createCategory(string $categoryName, string $parentId = '0'): array
   {
     $headers = [
       'Content-Type' => 'application/json',
@@ -147,7 +165,7 @@ class BraavoCategoryComponent extends BraavoComponent
       'ativo' => Status::ACTIVE,
       'data_1' => '2010-01-01',
       'data_2' => '2050-12-31',
-      'nome' => $data['parentName'],
+      'nome' => $categoryName,
       'google_cate' => 0,
     ];
 
@@ -164,8 +182,29 @@ class BraavoCategoryComponent extends BraavoComponent
     return $response['ok'];
   }
 
-  private function updateCategoryLink(string $parentId, string $categoryId): array
+  private function updateCategoryLink(string $categoryId, string $parentId): array
   {
-    return ['error' => 'Error updating category link'];
+    $headers = [
+      'Content-Type' => 'application/json',
+      'Accept' => 'application/json',
+    ];
+
+    $body = [
+      'id' => (string) $categoryId,
+      'pai_id' => (string) $parentId,
+      'ativo' => Status::ACTIVE,
+    ];
+
+    $response = $this->sendRequest('put', '/categorias/editar', $headers, $body);
+
+    if (isset($response['erro']) and $response['erro']) {
+      return ['error' => $response];
+    }
+
+    if (! isset($response['ok']['id']) or empty($response['ok']['id'])) {
+      return ['error' => 'Error updating category link'];
+    }
+
+    return $response['ok'];
   }
 }
