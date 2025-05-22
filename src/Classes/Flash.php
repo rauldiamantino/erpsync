@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helpers;
+namespace App\Classes;
 
 class Flash
 {
@@ -15,8 +15,8 @@ class Flash
       return null;
     }
 
-    $message = $_SESSION['flash'][$type];
-    unset($_SESSION['flash'][$type]);
+    $message = $_SESSION['flash'][ $type ];
+    unset($_SESSION['flash'][ $type ]);
 
     return htmlspecialchars($message);
   }

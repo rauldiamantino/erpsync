@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Components;
 
+use App\Classes\Config;
 use App\Classes\CurlRequest;
 
 class BraavoComponent
@@ -12,9 +13,9 @@ class BraavoComponent
 
   public function __construct()
   {
-    $this->baseUrl = getSetting('braavo_store_url');
-    $this->apiToken = getSetting('braavo_api_token');
-    $this->apiKey = getSetting('braavo_api_key');
+    $this->baseUrl = Config::get('braavo_store_url');
+    $this->apiToken = Config::get('braavo_api_token');
+    $this->apiKey = Config::get('braavo_api_key');
   }
 
   public function sendRequest($method, $endpoint, $headers, $body = null, $queryParams = null)

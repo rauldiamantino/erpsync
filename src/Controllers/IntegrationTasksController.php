@@ -2,15 +2,17 @@
 
 namespace App\Controllers;
 
-use App\Classes\Constants\ReferenceType;
-use App\Helpers\Flash;
-use App\Models\IntegrationTaskModel;
+use App\Classes\Flash;
+use App\Helpers\TypeHelper;
 use App\Controllers\Controller;
+use App\Controllers\SyncController;
+use App\Models\IntegrationTaskModel;
 use App\Classes\Constants\ServiceType;
 use App\Classes\Constants\TasksAction;
-use App\Controllers\Components\BlingCategorySchedulerComponent;
+use App\Classes\Constants\ReferenceType;
 use App\Controllers\Components\BlingProductSchedulerComponent;
-use App\Controllers\SyncController;
+use App\Controllers\Components\BlingCategorySchedulerComponent;
+use App\Helpers\RedirectHelper;
 
 class IntegrationTasksController extends Controller
 {
@@ -34,8 +36,8 @@ class IntegrationTasksController extends Controller
     $integrationTasks = $this->integrationTaskModel->all();
 
     foreach ($integrationTasks as $key => $value):
-      $integrationTasks[ $key ]['type'] = $this->getReferenceName($value['type']);
-      $integrationTasks[ $key ]['service'] = $this->getServiceName($value['service']);
+      $integrationTasks[ $key ]['type'] = TypeHelper::getReferenceName($value['type']);
+      $integrationTasks[ $key ]['service'] = TypeHelper::getServiceName($value['service']);
     endforeach;
 
     $this->view->assign('title', 'Integration Tasks');
@@ -70,10 +72,10 @@ class IntegrationTasksController extends Controller
       $result = (new BlingCategorySchedulerComponent($this->integrationTaskModel))->scheduleSync();
 
       if (isset($result['error']) or ! isset($result['total_scheduled'])) {
-        $this->redirect('/integration_tasks', 'error', 'Unable to receive categories');
+        RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive categories');
       }
 
-      $this->redirect('/integration_tasks', 'success', $result['total_scheduled'] . ' categories reiceved');
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' categories reiceved');
     }
   }
 
@@ -83,14 +85,14 @@ class IntegrationTasksController extends Controller
       $result = (new BlingProductSchedulerComponent($this->integrationTaskModel))->scheduleSync();
 
       if (isset($result['error']) or ! isset($result['total_scheduled'])) {
-        $this->redirect('/integration_tasks', 'error', 'Unable to receive products');
+        RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive products');
       }
 
       if (isset($result['neutral'])) {
-        $this->redirect('/integration_tasks', 'neutral', $result['neutral']);
+        RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
       }
 
-      $this->redirect('/integration_tasks', 'success', $result['total_scheduled'] . ' products received');
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' products received');
     }
   }
 
@@ -100,21 +102,21 @@ class IntegrationTasksController extends Controller
       $result = (new SyncController())->sync(ReferenceType::CATEGORY);
 
       if (isset($result['error'])) {
-        $this->redirect('/integration_tasks', 'error', $result['error']);
+        RedirectHelper::to('/integration_tasks', 'error', $result['error']);
       }
 
       if (isset($result['neutral'])) {
-        $this->redirect('/integration_tasks', 'neutral', $result['neutral']);
+        RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
       }
 
-      $this->redirect('/integration_tasks', 'success', $result['total_synchronized'] . ' categories submitted');
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] . ' categories submitted');
     }
   }
 
   public function sendProduct(int $serviceType): void
   {
     if ($serviceType === ServiceType::BLING) {
-      $this->redirect('/integration_tasks', 'success', 0 . ' products submitted');
+      RedirectHelper::to('/integration_tasks', 'success', 0 . ' products submitted');
     }
   }
 }

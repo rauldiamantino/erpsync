@@ -10,8 +10,9 @@ class Router
   protected string $defaultMethod = 'index';
   protected array $routes = [];
 
-  public function __construct(string $url)
+  public function __construct(?string $url = null)
   {
+    $url = $url ?? $_SERVER['REQUEST_URI'];
     $this->url = trim(parse_url($url, PHP_URL_PATH), '/');
   }
 

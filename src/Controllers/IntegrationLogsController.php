@@ -2,9 +2,10 @@
 
 namespace App\Controllers;
 
-use App\Helpers\Flash;
+use App\Classes\Flash;
 use App\Models\IntegrationLogModel;
 use App\Controllers\Controller;
+use App\Helpers\TypeHelper;
 
 class IntegrationLogsController extends Controller
 {
@@ -25,8 +26,8 @@ class IntegrationLogsController extends Controller
     $integrationLogs = $this->integrationLogModel->all();
 
     foreach ($integrationLogs as $key => $value):
-      $integrationLogs[ $key ]['type'] = $this->getReferenceName($value['type']);
-      $integrationLogs[ $key ]['service'] = $this->getServiceName($value['service']);
+      $integrationLogs[ $key ]['type'] = TypeHelper::getReferenceName($value['type']);
+      $integrationLogs[ $key ]['service'] = TypeHelper::getServiceName($value['service']);
       $integrationLogs[ $key ]['request_body'] = $this->formatterJson($value['request_body']);
       $integrationLogs[ $key ]['response_body'] = $this->formatterJson($value['response_body']);
     endforeach;

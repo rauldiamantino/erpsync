@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Components;
 
+use App\Classes\Config;
 use App\Classes\CurlRequest;
 
 class BlingComponent
@@ -16,11 +17,11 @@ class BlingComponent
   public function __construct()
   {
     $this->baseUrl = 'https://api.bling.com.br/Api/v3';
-    $this->clientId = getSetting('bling_client_id');
-    $this->clientSecret = getSetting('bling_client_secret');
-    $this->accessToken = getSetting('bling_access_token');
-    $this->refreshToken = getSetting('bling_refresh_token');
-    $this->expiresToken = getSetting('bling_expires_in');
+    $this->clientId = Config::get('bling_client_id');
+    $this->clientSecret = Config::get('bling_client_secret');
+    $this->accessToken = Config::get('bling_access_token');
+    $this->refreshToken = Config::get('bling_refresh_token');
+    $this->expiresToken = Config::get('bling_expires_in');
   }
 
   public function sendRequest($method, $endpoint, $headers, $body = null, $queryParams = null)
@@ -143,9 +144,9 @@ class BlingComponent
     $this->refreshToken = $response['refresh_token'];
     $this->expiresToken = $response['expires_in'] + time();
 
-    setSetting('bling_access_token', $this->accessToken);
-    setSetting('bling_refresh_token', $this->refreshToken);
-    setSetting('bling_expires_in', $this->expiresToken);
+    Config::set('bling_access_token', $this->accessToken);
+    Config::set('bling_refresh_token', $this->refreshToken);
+    Config::set('bling_expires_in', $this->expiresToken);
 
     return ['success' => true, 'message' => ''];
   }
