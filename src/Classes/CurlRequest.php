@@ -4,7 +4,6 @@ namespace App\Classes;
 
 class CurlRequest
 {
-
   public static function post(string $url, array $headers = [], $body = null): array
   {
     return self::request('POST', $url, $headers, $body);
@@ -25,7 +24,7 @@ class CurlRequest
     return self::request('DELETE', $url, $headers);
   }
 
-  public static function request(string $method, string $url, array $headers = [], $body = null, bool $isJson = true)
+  private static function request(string $method, string $url, array $headers = [], $body = null, bool $isJson = true)
   {
     $ch = curl_init();
 
@@ -110,7 +109,8 @@ class CurlRequest
 
       if (strpos($url, '?') === false) {
         $url .= '?';
-      } else {
+      }
+      else {
         $url .= '&';
       }
 
@@ -129,18 +129,13 @@ class CurlRequest
       mkdir($logDir, 0777, true);
     }
 
-    $curlCmd = "curl";
-
-    // Add method if not GET
-    if (strtoupper($data['method']) !== 'GET') {
-      $curlCmd .= " -X " . strtoupper($data['method']);
-    }
+    $curlCmd = "curl -X " . strtoupper($data['method']);
 
     // Add headers
     if ($data['headers']) {
-      foreach ($data['headers'] as $key => $value) {
+      foreach ($data['headers'] as $key => $value):
         $curlCmd .= " \\\n  -H '" . $key . ": " . $value . "'";
-      }
+      endforeach;
     }
 
     // Add body if exists and method supports it
@@ -161,16 +156,14 @@ class CurlRequest
     $curlCmd .= " \\\n  '" . $data['url'] . "'";
 
     // Format response
-    $responseText = is_array($data['response'])
-      ? json_encode($data['response'], JSON_UNESCAPED_UNICODE)
-      : $data['response'];
+    $responseText = is_array($data['response']) ? json_encode($data['response'], JSON_UNESCAPED_UNICODE) : $data['response'];
 
     // Log entry
     $logEntry = date('Y-m-d H:i:s') . " ------------------------------------------------------------------------------------------------------------\n\n";
     $logEntry .= $curlCmd . "\n\n";
     $logEntry .= "Response: " . $data['code'] . "\n\n" . $responseText . "\n\n";
 
-    if (!empty($data['error'])) {
+    if (isset($data['error']) and $data['error']) {
       $logEntry .= "Error: " . $data['error'] . "\n\n";
     }
 
