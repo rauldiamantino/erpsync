@@ -17,37 +17,37 @@ class Router
 
   public function addRoute(string $path, string $controller, string $method): void
   {
-    // Changes snake_case ControllerName to camelCase
-    $controller = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $controller))));
+    $controller = $this->formatControllerName($controller);
 
-    $this->routes[ $path ] = [
-      'controller' => ucfirst($controller) . 'Controller',
-      'method' => $method,
-    ];
+    if ($controller) {
+      $this->routes[ $path ] = ['controller' => $controller, 'method' => $method];
+    }
   }
 
   public function dispatch(): void
   {
-    if (isset($this->routes[ $this->url ])) {
-      $route = $this->routes[ $this->url ];
+    $urlData = $this->parseUrl();
+
+    $controllerName = $urlData['controller'];
+    $method = $urlData['method'];
+    $params = $urlData['params'];
+    $routeKey = $urlData['routeKey'];
+
+    if (isset($this->routes[ $routeKey ])) {
+      $route = $this->routes[ $routeKey ];
       $controllerName = $route['controller'];
       $method = $route['method'];
-      $params = [];
     }
     else {
-      $segments = explode('/', $this->url);
+      $controllerName = $this->formatControllerName($controllerName);
+    }
 
-      // Changes snake_case ControllerName to camelCase
-      $segments[0] = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $segments[0]))));
+    if (empty($controllerName)) {
+      $controllerName = $this->defaultController;
+    }
 
-      $controllerName = ucfirst($segments[0] ?? '') . 'Controller';
-
-      if (empty($controllerName) or $controllerName === 'Controller') {
-        $controllerName = $this->defaultController;
-      }
-
-      $method = $segments[1] ?? $this->defaultMethod;
-      $params = array_slice($segments, 2);
+    if (empty($method)) {
+      $method = $this->defaultMethod;
     }
 
     $controllerClass = $this->controllerNamespace . $controllerName;
@@ -67,5 +67,39 @@ class Router
     }
 
     call_user_func_array([$controller, $method], $params);
+  }
+
+  private function parseUrl(): array
+  {
+    $segments = explode('/', trim($this->url, '/'));
+
+    $controller = $segments[0] ?? '';
+    $method = $segments[1] ?? '';
+    $params = array_slice($segments, 2);
+
+    $routeSegments = [$controller, $method];
+    foreach ($params as $value):
+      $routeSegments[] = '{id}';
+    endforeach;
+
+    $routeKey = '/' . implode('/', $routeSegments);
+
+    return [
+      'controller' => $controller,
+      'method' => $method,
+      'params' => $params,
+      'routeKey' => $routeKey
+    ];
+  }
+
+  private function formatControllerName(string $nome): string
+  {
+    if (empty($nome)) {
+      return '';
+    }
+
+    $camelCase = str_replace(' ', '', ucwords(str_replace('_', ' ', $nome)));
+
+    return $camelCase . 'Controller';
   }
 }

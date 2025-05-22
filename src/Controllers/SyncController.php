@@ -25,9 +25,9 @@ class SyncController extends Controller
     $this->integrationTaskModel = new IntegrationTaskModel();
   }
 
-  public function sync()
+  public function sync(int $referenceType)
   {
-    $resultTasks = $this->integrationTaskModel->findNextTask();
+    $resultTasks = $this->integrationTaskModel->findNextTask($referenceType);
 
     if (empty($resultTasks)) {
       return ['neutral' => 'No records found'];

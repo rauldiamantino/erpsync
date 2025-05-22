@@ -25,13 +25,14 @@ class IntegrationTaskModel extends Model
     $this->createOrUpdate($data);
   }
 
-  public function findNextTask(): mixed
+  public function findNextTask(int $referenceType): mixed
   {
     $sql = <<<SQL
-  SELECT * FROM {$this->table} WHERE `attempts` < :attempts ORDER BY `id` ASC LIMIT :limit
+  SELECT * FROM {$this->table} WHERE `type` = :type AND `attempts` < :attempts ORDER BY `id` ASC LIMIT :limit
   SQL;
 
     $data = [
+      ':type' => $referenceType,
       ':attempts' => 3,
       ':limit' => 1,
     ];

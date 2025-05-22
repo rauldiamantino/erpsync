@@ -1,5 +1,5 @@
 <div class="w-full">
-  <div class="w-full flex gap-2 justify-end mb-4">
+  <!-- <div class="w-full flex gap-2 justify-end mb-4">
     <button
       id="btn-receive"
       type="button"
@@ -17,9 +17,9 @@
     >
       Enviar
     </button>
-  </div>
+  </div> -->
 
-  <!-- <nav class="w-full flex justify-start gap-10 p-4">
+  <nav class="w-full flex justify-start gap-10 p-4">
     <div class="max-w-7xl flex items-start gap-8">
       <div class="text-xl font-bold text-gray-800">Receber <span class="text-base font-light italic">(ERP)</span></div>
       <ul class="space-y-2">
@@ -41,7 +41,7 @@
         <?php endforeach; ?>
       </ul>
     </div>
-  </nav> -->
+  </nav>
 
   <div class="w-full overflow-auto">
     <table class="min-w-[1200px] border border-gray-300 divide-y divide-gray-200 table-auto">
