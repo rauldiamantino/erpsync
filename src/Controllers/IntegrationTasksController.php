@@ -61,6 +61,7 @@ class IntegrationTasksController extends Controller
       ],
       TasksAction::SEND => [
         ['url' => '/integration_tasks/send_category/' . ServiceType::BLING, 'description' => 'Categorias'],
+        ['url' => '/integration_tasks/send_supplier/' . ServiceType::BLING, 'description' => 'Fornecedores'],
         ['url' => '/integration_tasks/send_product/' . ServiceType::BLING, 'description' => 'Produtos'],
       ],
     ];
@@ -77,7 +78,7 @@ class IntegrationTasksController extends Controller
         RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive categories');
       }
 
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' categories reiceved');
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] ?? 0 . ' categories reiceved');
     }
   }
 
@@ -90,7 +91,7 @@ class IntegrationTasksController extends Controller
         RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive suppliers');
       }
 
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' suppliers reiceved');
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] ?? 0 . ' suppliers reiceved');
     }
   }
 
@@ -107,7 +108,7 @@ class IntegrationTasksController extends Controller
         RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
       }
 
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' products received');
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] ?? 0 . ' products received');
     }
   }
 
@@ -124,7 +125,24 @@ class IntegrationTasksController extends Controller
         RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
       }
 
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] . ' categories submitted');
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] ?? 0 . ' categories submitted');
+    }
+  }
+
+  public function sendSupplier(int $serviceType): void
+  {
+    if ($serviceType === ServiceType::BLING) {
+      $result = (new SyncController())->sync(ReferenceType::SUPPLIER);
+
+      if (isset($result['error'])) {
+        RedirectHelper::to('/integration_tasks', 'error', $result['error']);
+      }
+
+      if (isset($result['neutral'])) {
+        RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
+      }
+
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] ?? 0 . ' categories submitted');
     }
   }
 

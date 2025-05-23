@@ -3,22 +3,35 @@
 namespace App\Controllers\Components;
 
 use App\Controllers\Components\BlingComponent;
+use App\Controllers\Components\BraavoSupplierComponent;
 
 class BlingSupplierSyncComponent extends BlingComponent
 {
   public function syncToEcommerce(int $id): array
   {
     if (empty($id)) {
-      return ['error' => 'Empty supplier ID'];
+      return ['error' => ['request_body' => [], 'response_body' => 'Empty supplier ID']];
     }
 
     $response = $this->fetchBlingSupplier($id);
 
     if (isset($response['error'])) {
-      return $response;
+      return ['error' => ['request_body' => [], 'response_body' => $response['error']]];
     }
 
-    return $response;
+    $supplier = [
+      'id' => intval($response['id'] ?? 0),
+      'name' => $response['nome'] ?? '',
+    ];
+
+    $braavoComponent = new BraavoSupplierComponent();
+    $responsePlatform = $braavoComponent->sync($supplier);
+
+    if (isset($responsePlatform['error'])) {
+      return ['error' => ['request_body' => $supplier, 'response_body' => $responsePlatform['error']]];
+    }
+
+    return ['success' => ['request_body' => $supplier, 'response_body' => $responsePlatform]];
   }
 
   private function fetchBlingSupplier(int $id): array
@@ -31,7 +44,7 @@ class BlingSupplierSyncComponent extends BlingComponent
     $queryParams = [
       'pagina' => 1,
       'limite' => 1,
-      'idTipoContato' => [ $id ],
+      'idsContatos' => [ $id ],
     ];
 
     $response = $this->sendRequest('get', '/contatos', $headers, null, $queryParams);
@@ -44,10 +57,10 @@ class BlingSupplierSyncComponent extends BlingComponent
       return $response;
     }
 
-    if (! isset($response['data']['id'])) {
+    if (! isset($response['data'][0]['id'])) {
       return [];
     }
 
-    return $response['data'];
+    return $response['data'][0];
   }
 }

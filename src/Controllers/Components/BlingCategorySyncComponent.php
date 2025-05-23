@@ -21,7 +21,7 @@ class BlingCategorySyncComponent extends BlingComponent
     $response = $this->fetchBlingCategory($id);
 
     if (isset($response['error'])) {
-      return $response;
+      return ['error' => ['request_body' => [], 'response_body' => $response['error']]];
     }
 
     $category = [
@@ -34,7 +34,7 @@ class BlingCategorySyncComponent extends BlingComponent
     $response = $this->getParentCategoryName($category);
 
     if (isset($response['error'])) {
-      return ['error' => ['request_body' => $category, 'response_body' => $response]];
+      return ['error' => ['request_body' => $category, 'response_body' => $response['error']]];
     }
 
     $category['parentName'] = $response['descricao'] ?? '';
@@ -43,7 +43,7 @@ class BlingCategorySyncComponent extends BlingComponent
     $responsePlatform = $braavoComponent->sync($category);
 
     if (isset($responsePlatform['error'])) {
-      return ['error' => ['request_body' => $category, 'response_body' => $responsePlatform]];
+      return ['error' => ['request_body' => $category, 'response_body' => $responsePlatform['error']]];
     }
 
     return ['success' => ['request_body' => $category, 'response_body' => $responsePlatform]];
