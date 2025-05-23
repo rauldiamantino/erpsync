@@ -24,7 +24,7 @@ class TypeHelper
       ReferenceType::CATEGORY => 'Categoria',
       ReferenceType::BRAND => 'Marca',
       ReferenceType::STOCK => 'Estoque',
-      ReferenceType::SUPPLIER => 'Fornecedorpr($suppliersIds);die;',
+      ReferenceType::SUPPLIER => 'Fornecedor',
     ];
 
     return $referencesTypes[ $referenceType ] ?? 'Desconhecido';
