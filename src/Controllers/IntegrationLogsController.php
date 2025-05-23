@@ -27,7 +27,8 @@ class IntegrationLogsController extends Controller
 
     foreach ($integrationLogs as $key => $value):
       $integrationLogs[ $key ]['type'] = TypeHelper::getReferenceName($value['type']);
-      $integrationLogs[ $key ]['service'] = TypeHelper::getServiceName($value['service']);
+      $integrationLogs[ $key ]['service_from'] = TypeHelper::getServiceName($value['service_from']);
+      $integrationLogs[ $key ]['service_to'] = TypeHelper::getServiceName($value['service_to']);
       $integrationLogs[ $key ]['request_body'] = $this->formatterJson($value['request_body']);
       $integrationLogs[ $key ]['response_body'] = $this->formatterJson($value['response_body']);
     endforeach;

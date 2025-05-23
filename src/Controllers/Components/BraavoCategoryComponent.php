@@ -70,6 +70,13 @@ class BraavoCategoryComponent extends BraavoComponent
     $categoryId = $categoriesIds[ $data['name'] ] ?? '0';
     $parentId = $result['parentId'] ?? '0';
 
+    $result = [
+      'categoryId' => $categoryId,
+      'categoryName' => $categoryName,
+      'parentId' => $parentId,
+      'obs' => 'The category already exists',
+    ];
+
     if (empty($categoryId)) {
       $response = $this->createCategory($categoryName, $parentId);
 
@@ -77,6 +84,7 @@ class BraavoCategoryComponent extends BraavoComponent
         return $response;
       }
 
+      $result = $response;
       $categoryId = $response['id'];
     }
 
@@ -86,9 +94,11 @@ class BraavoCategoryComponent extends BraavoComponent
       if (isset($response['error'])) {
         return $response;
       }
+
+      $result['updateLink'] = $response;
     }
 
-    return ['success' => true, 'parentId' => $parentId, 'parentName' => $parentName, 'categoryId' => $categoryId, 'categoryName' => $categoryName];
+    return $result;
   }
 
   private function fetchAllBraavoCategory(array $body): array

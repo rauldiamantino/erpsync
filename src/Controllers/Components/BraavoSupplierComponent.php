@@ -54,6 +54,12 @@ class BraavoSupplierComponent extends BraavoComponent
     $supplierName = $data['name'];
     $supplierId = $suppliersIds[ $data['name'] ] ?? '0';
 
+    $result = [
+      'supplierId' => $supplierId,
+      'supplierName' => $supplierName,
+      'obs' => 'The supplier already exists',
+    ];
+
     if (empty($supplierId)) {
       $response = $this->createSupplier($supplierName);
 
@@ -61,10 +67,10 @@ class BraavoSupplierComponent extends BraavoComponent
         return $response;
       }
 
-      $supplierId = $response['id'];
+      $result = $response;
     }
 
-    return ['success' => true, 'supplierId' => $supplierId, 'categoryName' => $supplierName];
+    return $result;
   }
 
   private function fetchAllBraavoSupplier(array $body): array
