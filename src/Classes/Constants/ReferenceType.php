@@ -9,4 +9,5 @@ final class ReferenceType
   public const CATEGORY = 3;
   public const BRAND = 4;
   public const STOCK = 5;
+  public const SUPPLIER = 6;
 }

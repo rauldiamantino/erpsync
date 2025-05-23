@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Classes\Flash;
 use App\Helpers\TypeHelper;
 use App\Controllers\Controller;
+use App\Helpers\RedirectHelper;
 use App\Controllers\SyncController;
 use App\Models\IntegrationTaskModel;
 use App\Classes\Constants\ServiceType;
@@ -12,7 +13,7 @@ use App\Classes\Constants\TasksAction;
 use App\Classes\Constants\ReferenceType;
 use App\Controllers\Components\BlingProductSchedulerComponent;
 use App\Controllers\Components\BlingCategorySchedulerComponent;
-use App\Helpers\RedirectHelper;
+use App\Controllers\Components\BlingSupplierSchedulerComponent;
 
 class IntegrationTasksController extends Controller
 {
@@ -55,6 +56,7 @@ class IntegrationTasksController extends Controller
     $taskActionUrls = [
       TasksAction::RECEIVE => [
         ['url' => '/integration_tasks/receive_category/' . ServiceType::BLING, 'description' => 'Categorias'],
+        ['url' => '/integration_tasks/receive_supplier/' . ServiceType::BLING, 'description' => 'Fornecedores'],
         ['url' => '/integration_tasks/receive_product/' . ServiceType::BLING, 'description' => 'Produtos'],
       ],
       TasksAction::SEND => [
@@ -76,6 +78,19 @@ class IntegrationTasksController extends Controller
       }
 
       RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' categories reiceved');
+    }
+  }
+
+  public function receiveSupplier(int $serviceType): void
+  {
+    if ($serviceType === ServiceType::BLING) {
+      $result = (new BlingSupplierSchedulerComponent($this->integrationTaskModel))->scheduleSync();
+
+      if (isset($result['error']) or ! isset($result['total_scheduled'])) {
+        RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive suppliers');
+      }
+
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' suppliers reiceved');
     }
   }
 
