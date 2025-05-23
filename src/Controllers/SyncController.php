@@ -36,6 +36,9 @@ class SyncController extends Controller
 
     $response = [];
 
+    // Review - Create a setting
+    $serviceTo = ServiceType::BRAAVO;
+
     if ($resultTasks['service'] === ServiceType::BLING and $resultTasks['type'] === ReferenceType::CATEGORY) {
       $response = (new BlingCategorySyncComponent())->syncToEcommerce($resultTasks['reference_id']);
     }
@@ -62,7 +65,8 @@ class SyncController extends Controller
 
     $this->integrationLogModel->createOrUpdate([
       'type' => $resultTasks['type'],
-      'service' => $resultTasks['service'],
+      'service_from' => $resultTasks['service'],
+      'service_to' => $serviceTo,
       'reference_id' => $resultTasks['reference_id'],
       'request_body' => json_encode($response['success']['request_body']),
       'response_body' => json_encode($response['success']['response_body']),

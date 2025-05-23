@@ -11,6 +11,7 @@ class TypeHelper
   {
     $services = [
       ServiceType::BLING => 'Bling',
+      ServiceType::BRAAVO => 'Braavo',
     ];
 
     return $services[ $serviceType ] ?? 'Desconhecido';
