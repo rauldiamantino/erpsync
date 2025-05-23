@@ -78,7 +78,7 @@ class IntegrationTasksController extends Controller
         RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive categories');
       }
 
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] ?? 0 . ' categories reiceved');
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' categories reiceved');
     }
   }
 
@@ -91,7 +91,7 @@ class IntegrationTasksController extends Controller
         RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive suppliers');
       }
 
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] ?? 0 . ' suppliers reiceved');
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' suppliers reiceved');
     }
   }
 
@@ -108,7 +108,7 @@ class IntegrationTasksController extends Controller
         RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
       }
 
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] ?? 0 . ' products received');
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' products received');
     }
   }
 
@@ -125,7 +125,7 @@ class IntegrationTasksController extends Controller
         RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
       }
 
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] ?? 0 . ' categories submitted');
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] . ' categories submitted');
     }
   }
 
@@ -142,7 +142,7 @@ class IntegrationTasksController extends Controller
         RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
       }
 
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] ?? 0 . ' categories submitted');
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] . ' categories submitted');
     }
   }
 
