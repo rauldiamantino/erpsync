@@ -54,8 +54,8 @@ class BraavoVariationComponent extends BraavoComponent
       return $responseVar2Type;
     }
 
-    $variation1TypeId = $responseVar1Type['id'];
-    $variation2TypeId = $responseVar2Type['id'];
+    $variation1TypeId = $responseVar1Type['id'] ?? '';
+    $variation2TypeId = $responseVar2Type['id'] ?? '';
 
     // Variation ID
     $responseVar1 = $this->createVariation($variation1Name, $variation1TypeId, $variationsIds);
@@ -113,7 +113,7 @@ class BraavoVariationComponent extends BraavoComponent
     return $variationsIds;
   }
 
-  private function createVariationType(string $variationType, array $variationsIds): array
+  private function createVariationType(?string $variationType, array $variationsIds): array
   {
     if (empty($variationType)) {
       return [];
@@ -140,9 +140,9 @@ class BraavoVariationComponent extends BraavoComponent
     return ['id' => $response['id']];
   }
 
-  private function createVariation(string $variation, int $variationTypeId, array $variationsIds): array
+  private function createVariation(?string $variation, ?int $variationTypeId, array $variationsIds): array
   {
-    if (empty($variation)) {
+    if (empty($variation) or empty($variationTypeId)) {
       return [];
     }
 

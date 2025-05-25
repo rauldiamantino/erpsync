@@ -102,7 +102,7 @@ class CurlRequest
     return $response;
   }
 
-  public static function get(string $url, array $headers = [], array $queryParams = null, $body = null): array
+  public static function get(string $url, array $headers = [], array $queryParams = null, $body = null): mixed
   {
     if ($queryParams) {
       $queryString = http_build_query($queryParams);

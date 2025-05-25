@@ -60,7 +60,11 @@ class SyncController extends Controller
     }
 
     if (empty($response)) {
-      return ['neutral' => 'No records found'];
+      return [
+        'type' => 'neutral',
+        'message' => 'No records found',
+        'taskId' => $resultTasks['id'],
+      ];
     }
 
     if (isset($response['error'])) {
@@ -70,7 +74,11 @@ class SyncController extends Controller
         'response_body' => json_encode($response['error']['response_body']),
       ]);
 
-      return ['error' => 'It was not possible to send the registration ' . $resultTasks['id'] . ' to the platform'];
+      return [
+        'type' => 'error',
+        'message' => 'It was not possible to send the registration to the platform',
+        'taskId' => $resultTasks['id'],
+      ];
     }
 
     $this->integrationTaskModel->delete($resultTasks['id']);
@@ -84,6 +92,10 @@ class SyncController extends Controller
       'response_body' => json_encode($response['success']['response_body']),
     ]);
 
-    return ['success' => true, 'total_synchronized' => 1];
+    return [
+      'type' => 'success',
+      'message' => 'Synchronized',
+      'taskId' => $resultTasks['id'],
+    ];
   }
 }

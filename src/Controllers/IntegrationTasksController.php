@@ -30,7 +30,7 @@ class IntegrationTasksController extends Controller
     $this->integrationTaskModel = new IntegrationTaskModel();
   }
 
-  public function index(): void
+  public function index()
   {
     $receiveUrls = $this->getActionUrl(TasksAction::RECEIVE);
     $sendUrls = $this->getActionUrl(TasksAction::SEND);
@@ -75,131 +75,131 @@ class IntegrationTasksController extends Controller
     return $taskActionUrls[ $taskAction ] ?? [];
   }
 
-  public function receiveCategory(int $serviceType): void
+  public function receiveCategory(int $serviceType)
   {
     if ($serviceType === ServiceType::BLING) {
       $result = (new BlingCategorySchedulerComponent($this->integrationTaskModel))->scheduleSync();
 
       if (isset($result['error']) or ! isset($result['total_scheduled'])) {
-        RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive categories');
+        return RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive categories');
       }
 
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' categories reiceved');
+      return RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' categories reiceved');
     }
   }
 
-  public function receiveSupplier(int $serviceType): void
+  public function receiveSupplier(int $serviceType)
   {
     if ($serviceType === ServiceType::BLING) {
       $result = (new BlingSupplierSchedulerComponent($this->integrationTaskModel))->scheduleSync();
 
       if (isset($result['error']) or ! isset($result['total_scheduled'])) {
-        RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive suppliers');
+        return RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive suppliers');
       }
 
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' suppliers reiceved');
+      return RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' suppliers reiceved');
     }
   }
 
-  public function receiveProduct(int $serviceType): void
+  public function receiveProduct(int $serviceType)
   {
     if ($serviceType === ServiceType::BLING) {
       $result = (new BlingProductSchedulerComponent($this->integrationTaskModel))->scheduleSync();
 
       if (isset($result['error']) or ! isset($result['total_scheduled'])) {
-        RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive products');
+        return RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive products');
       }
 
       if (isset($result['neutral'])) {
-        RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
+        return RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
       }
 
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' products received');
+      return RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' products received');
     }
   }
 
-  public function sendCategory(int $serviceType): void
+  public function sendCategory(int $serviceType)
   {
     if ($serviceType === ServiceType::BLING) {
       $result = (new SyncController())->sync(ReferenceType::CATEGORY);
 
-      if (isset($result['error'])) {
-        RedirectHelper::to('/integration_tasks', 'error', $result['error']);
+      $type = $result['type'] ?? 'error';
+      $taskId = $result['taskId'] ?? '';
+      $message = $result['message'] ?? '';
+
+      if ($taskId) {
+        $message = 'ID #' . $taskId . ' ' . $message;
       }
 
-      if (isset($result['neutral'])) {
-        RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
-      }
-
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] . ' categories submitted');
+      return RedirectHelper::to('/integration_tasks', $type, $message);
     }
   }
 
-  public function sendSupplier(int $serviceType): void
+  public function sendSupplier(int $serviceType)
   {
     if ($serviceType === ServiceType::BLING) {
       $result = (new SyncController())->sync(ReferenceType::SUPPLIER);
 
-      if (isset($result['error'])) {
-        RedirectHelper::to('/integration_tasks', 'error', $result['error']);
+      $type = $result['type'] ?? 'error';
+      $taskId = $result['taskId'] ?? '';
+      $message = $result['message'] ?? '';
+
+      if ($taskId) {
+        $message = 'ID #' . $taskId . ' ' . $message;
       }
 
-      if (isset($result['neutral'])) {
-        RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
-      }
-
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] . ' categories submitted');
+      return RedirectHelper::to('/integration_tasks', $type, $message);
     }
   }
 
-  public function sendProduct(int $serviceType): void
+  public function sendProduct(int $serviceType)
   {
     if ($serviceType === ServiceType::BLING) {
       $result = (new SyncController())->sync(ReferenceType::PRODUCT);
 
-      if (isset($result['error'])) {
-        RedirectHelper::to('/integration_tasks', 'error', $result['error']);
+      $type = $result['type'] ?? 'error';
+      $taskId = $result['taskId'] ?? '';
+      $message = $result['message'] ?? '';
+
+      if ($taskId) {
+        $message = 'ID #' . $taskId . ' ' . $message;
       }
 
-      if (isset($result['neutral'])) {
-        RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
-      }
-
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] . ' products submitted');
+      return RedirectHelper::to('/integration_tasks', $type, $message);
     }
   }
 
-  public function sendSku(int $serviceType): void
+  public function sendSku(int $serviceType)
   {
     if ($serviceType === ServiceType::BLING) {
       $result = (new SyncController())->sync(ReferenceType::SKU);
 
-      if (isset($result['error'])) {
-        RedirectHelper::to('/integration_tasks', 'error', $result['error']);
+      $type = $result['type'] ?? 'error';
+      $taskId = $result['taskId'] ?? '';
+      $message = $result['message'] ?? '';
+
+      if ($taskId) {
+        $message = 'ID #' . $taskId . ' ' . $message;
       }
 
-      if (isset($result['neutral'])) {
-        RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
-      }
-
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] . ' skus submitted');
+      return RedirectHelper::to('/integration_tasks', $type, $message);
     }
   }
 
-  public function sendAll(int $serviceType): void
+  public function sendAll(int $serviceType)
   {
     if ($serviceType === ServiceType::BLING) {
       $result = (new SyncController())->sync();
 
-      if (isset($result['error'])) {
-        RedirectHelper::to('/integration_tasks', 'error', $result['error']);
+      $type = $result['type'] ?? 'error';
+      $taskId = $result['taskId'] ?? '';
+      $message = $result['message'] ?? '';
+
+      if ($taskId) {
+        $message = 'ID #' . $taskId . ' ' . $message;
       }
 
-      if (isset($result['neutral'])) {
-        RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
-      }
-
-      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] . ' items submitted');
+      return RedirectHelper::to('/integration_tasks', $type, $message);
     }
   }
 }
