@@ -7,9 +7,11 @@ use App\Models\IntegrationLogModel;
 use App\Models\IntegrationTaskModel;
 use App\Classes\Constants\ServiceType;
 use App\Classes\Constants\ReferenceType;
+use App\Controllers\Components\BlingSkuSyncComponent;
+use App\Controllers\Components\BlingProductSyncComponent;
 use App\Controllers\Components\BlingCategorySyncComponent;
 use App\Controllers\Components\BlingSupplierSyncComponent;
-use App\Controllers\Components\BlingProductSyncComponent;
+use App\Helpers\ConversionHelper;
 
 class SyncController extends Controller
 {
@@ -36,20 +38,25 @@ class SyncController extends Controller
     }
 
     $response = [];
+    $dataTask = ConversionHelper::jsonToArray($resultTasks['data'] ?? null);
 
     // Review - Create a setting
     $serviceTo = ServiceType::BRAAVO;
 
     if ($resultTasks['service'] === ServiceType::BLING and $resultTasks['type'] === ReferenceType::CATEGORY) {
-      $response = (new BlingCategorySyncComponent())->syncToEcommerce($resultTasks['reference_id']);
+      $response = (new BlingCategorySyncComponent())->syncToEcommerce($resultTasks['reference_id'], $dataTask);
     }
 
     if ($resultTasks['service'] === ServiceType::BLING and $resultTasks['type'] === ReferenceType::SUPPLIER) {
-      $response = (new BlingSupplierSyncComponent())->syncToEcommerce($resultTasks['reference_id']);
+      $response = (new BlingSupplierSyncComponent())->syncToEcommerce($resultTasks['reference_id'], $dataTask);
     }
 
     if ($resultTasks['service'] === ServiceType::BLING and $resultTasks['type'] === ReferenceType::PRODUCT) {
-      $response = (new BlingProductSyncComponent())->syncToEcommerce($resultTasks['reference_id']);
+      $response = (new BlingProductSyncComponent())->syncToEcommerce($resultTasks['reference_id'], $dataTask);
+    }
+
+    if ($resultTasks['service'] === ServiceType::BLING and $resultTasks['type'] === ReferenceType::SKU) {
+      $response = (new BlingSkuSyncComponent())->syncToEcommerce($resultTasks['reference_id'], $dataTask);
     }
 
     if (empty($response)) {

@@ -94,7 +94,7 @@ class BraavoSupplierComponent extends BraavoComponent
       return $response;
     }
 
-    return $response['ok'];
+    return $response['ok'] ?? [];
   }
 
   private function extractSupplierIds(array $response): array

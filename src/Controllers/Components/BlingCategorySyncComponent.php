@@ -12,7 +12,7 @@ class BlingCategorySyncComponent extends BlingComponent
     parent::__construct();
   }
 
-  public function syncToEcommerce(int $id): array
+  public function syncToEcommerce(int $id, array $data): array
   {
     if (empty($id)) {
       return ['error' => ['request_body' => [], 'response_body' => 'Empty category ID']];

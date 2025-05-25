@@ -7,7 +7,7 @@ use App\Controllers\Components\BraavoSupplierComponent;
 
 class BlingSupplierSyncComponent extends BlingComponent
 {
-  public function syncToEcommerce(int $id): array
+  public function syncToEcommerce(int $id, array $data): array
   {
     if (empty($id)) {
       return ['error' => ['request_body' => [], 'response_body' => 'Empty supplier ID']];

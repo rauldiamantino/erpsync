@@ -40,6 +40,7 @@ class IntegrationTasksController extends Controller
     foreach ($integrationTasks as $key => $value):
       $integrationTasks[ $key ]['type'] = TypeHelper::getReferenceName($value['type']);
       $integrationTasks[ $key ]['service'] = TypeHelper::getServiceName($value['service']);
+      $integrationTasks[ $key ]['data'] = ConversionHelper::formatterJson($value['data']);
       $integrationTasks[ $key ]['request_body'] = ConversionHelper::formatterJson($value['request_body']);
       $integrationTasks[ $key ]['response_body'] = ConversionHelper::formatterJson($value['response_body']);
     endforeach;
@@ -66,6 +67,7 @@ class IntegrationTasksController extends Controller
         ['url' => '/integration_tasks/send_category/' . ServiceType::BLING, 'description' => 'Categorias'],
         ['url' => '/integration_tasks/send_supplier/' . ServiceType::BLING, 'description' => 'Fornecedores'],
         ['url' => '/integration_tasks/send_product/' . ServiceType::BLING, 'description' => 'Produtos'],
+        ['url' => '/integration_tasks/send_sku/' . ServiceType::BLING, 'description' => 'Skus'],
       ],
     ];
 
@@ -163,6 +165,23 @@ class IntegrationTasksController extends Controller
       }
 
       RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] . ' products submitted');
+    }
+  }
+
+  public function sendSku(int $serviceType): void
+  {
+    if ($serviceType === ServiceType::BLING) {
+      $result = (new SyncController())->sync(ReferenceType::SKU);
+
+      if (isset($result['error'])) {
+        RedirectHelper::to('/integration_tasks', 'error', $result['error']);
+      }
+
+      if (isset($result['neutral'])) {
+        RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
+      }
+
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] . ' skus submitted');
     }
   }
 }

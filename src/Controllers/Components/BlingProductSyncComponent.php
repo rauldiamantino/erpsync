@@ -7,7 +7,7 @@ use App\Controllers\Components\BraavoProductComponent;
 
 class BlingProductSyncComponent extends BlingComponent
 {
-  public function syncToEcommerce(int $id): array
+  public function syncToEcommerce(int $id, array $data): array
   {
     if (empty($id)) {
       return ['error' => ['request_body' => [], 'response_body' => 'Empty product ID']];
@@ -27,7 +27,7 @@ class BlingProductSyncComponent extends BlingComponent
       'stock' => $response['estoque']['saldoVirtualTotal'] ?? 0,
       'stockLocation' => $response['estoque']['localizacao'] ?? '',
       'status' => $response['situacao'] ?? '',
-      'format' => $response['formato'] ?? '',
+      'format' => strtoupper($response['formato'] ?? ''),
       'shortDescription' => $response['descricaoCurta'] ?? '',
       'additionalDescription' => $response['descricaoComplementar'] ?? '',
       'unit' => $response['unidade'] ?? '',

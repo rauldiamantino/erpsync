@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\ConversionHelper;
 use App\Models\Model;
 
 class IntegrationTaskModel extends Model
@@ -13,7 +14,7 @@ class IntegrationTaskModel extends Model
     $this->setTable('integration_tasks');
   }
 
-  public function scheduleTask(int $type, int $service, int $referenceId): void
+  public function scheduleTask(int $type, int $service, int $referenceId, array $dataTask = []): void
   {
     $data = [
       'type' => (int) $type,
@@ -21,6 +22,10 @@ class IntegrationTaskModel extends Model
       'reference_id' => (int) $referenceId,
       'attempts' => 0,
     ];
+
+    if ($dataTask) {
+      $data['data'] = ConversionHelper::arrayToJson($dataTask);
+    }
 
     $this->createOrUpdate($data);
   }

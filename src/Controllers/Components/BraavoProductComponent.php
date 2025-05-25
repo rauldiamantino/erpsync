@@ -54,7 +54,7 @@ class BraavoProductComponent extends BraavoComponent
       return ['error' => ['payload' => $payload, 'response' => $response['error']]];
     }
 
-    $this->scheduleSkusTasks($data);
+    $this->scheduleSkusTasks($data, $response);
 
     return ['success' => ['payload' => $payload, 'response' => $response]];
   }
@@ -131,7 +131,7 @@ class BraavoProductComponent extends BraavoComponent
       return $response;
     }
 
-    return $response['ok'];
+    return $response['ok'] ?? [];
   }
 
   private function preparePayload(array $data): array
@@ -178,7 +178,7 @@ class BraavoProductComponent extends BraavoComponent
 
     // Status
     if (strtoupper($data['status']) == 'A') {
-      $payload['status'] = '1';
+      $payload['ativo'] = '1';
     }
 
     return $payload;
@@ -269,14 +269,7 @@ class BraavoProductComponent extends BraavoComponent
       'Accept' => 'application/json',
     ];
 
-    $method = 'post';
-    $body = $payload;
-
-    if (isset($payload['id'])) {
-      $method = 'put';
-    }
-
-    $response = $this->sendRequest($method, '/categorias/adicionar', $headers, $body);
+    $response = $this->sendRequest('post', '/produtos/adicionar', $headers, $payload);
 
     if (isset($response['erro']) and $response['erro']) {
       return ['error' => $response];
@@ -289,16 +282,23 @@ class BraavoProductComponent extends BraavoComponent
     return $response['ok'];
   }
 
-  private function scheduleSkusTasks($data)
+  private function scheduleSkusTasks($data, $response)
   {
     if (! isset($data['skus'][0]['id'])) {
       return;
     }
 
+    $braavoProductId = $response['id'] ?? 0;
+    $braavoProductId = (int) $braavoProductId;
+
+    $dataTask = [
+      'braavoProductId' => $braavoProductId,
+    ];
+
     foreach ($data['skus'] as $value):
 
       if (isset($value['id']) and $value['id']) {
-        $this->integrationTaskModel->scheduleTask(ReferenceType::SKU, ServiceType::BLING, $value['id']);
+        $this->integrationTaskModel->scheduleTask(ReferenceType::SKU, ServiceType::BLING, $value['id'], $dataTask);
       }
     endforeach;
   }
