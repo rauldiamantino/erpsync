@@ -25,7 +25,7 @@ class BraavoSupplierComponent extends BraavoComponent
     }
 
     if ($missingFields) {
-      return ['error' => 'Incomplete data. Missing fields: ' . implode(', ', $missingFields)];
+      return $this->returnError('Incomplete data. Missing fields: ' . implode(', ', $missingFields));
     }
 
     $page = 1;
@@ -41,7 +41,7 @@ class BraavoSupplierComponent extends BraavoComponent
       $response = $this->fetchAllBraavoSupplier($body);
 
       if (isset($response['error'])) {
-        return $response;
+        return $this->returnError($response);
       }
 
       $extractIds = $this->extractSupplierIds($response);
@@ -64,13 +64,13 @@ class BraavoSupplierComponent extends BraavoComponent
       $response = $this->createSupplier($supplierName);
 
       if (isset($response['error'])) {
-        return $response;
+        return $this->returnError($response);
       }
 
       $result = $response;
     }
 
-    return $result;
+    return $this->returnSuccess($result);
   }
 
   public function fetchAllBraavoSupplier(array $body): array

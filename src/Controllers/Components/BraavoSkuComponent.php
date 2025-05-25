@@ -26,34 +26,34 @@ class BraavoSkuComponent extends BraavoComponent
     $missingFields = $this->checkMissingFields($data);
 
     if (isset($missingFields['error'])) {
-      return ['error' => ['payload' => $data, 'response' => $missingFields['error']]];
+      return $this->returnError($missingFields, $data);
     }
 
     $skuExists = $this->checkSkuExists($data['code']);
 
     if (isset($skuExists['error'])) {
-      return ['error' => ['payload' => $data, 'response' => $skuExists['error']]];
+      return $this->returnError($skuExists, $data);
     }
 
     if (isset($skuExists['id'])) {
-      return ['error' => ['payload' => $data, 'response' => 'The sku already exists']];
+      return $this->returnError('The sku already exists', $data);
     }
 
     $payload = $this->preparePayload($data, $braavoProductId);
 
     if (isset($payload['error'])) {
-      return ['error' => ['payload' => $data, 'response' => $payload['error']]];
+      return $this->returnError($payload, $data);
     }
 
     $response = $this->createSku($payload);
 
     if (isset($response['error'])) {
-      return ['error' => ['payload' => $payload, 'response' => $response['error']]];
+      return $this->returnError($response, $payload);
     }
 
     $this->scheduleEstoquesTasks($data, $response);
 
-    return ['success' => ['payload' => $payload, 'response' => $response]];
+    return $this->returnSuccess($response, $payload);
   }
 
   private function checkMissingFields(array $data): array
@@ -140,8 +140,8 @@ class BraavoSkuComponent extends BraavoComponent
       return $response;
     }
 
-    $payload['var1_id'] = strval($response['variation1Id'] ?? 0);
-    $payload['var2_id'] = strval($response['variation2Id'] ?? 0);
+    $payload['var1_id'] = strval($response['success']['variation1Id'] ?? 0);
+    $payload['var2_id'] = strval($response['success']['variation2Id'] ?? 0);
 
     // Status
     if (strtoupper($data['status']) == 'A') {

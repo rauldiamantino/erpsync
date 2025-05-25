@@ -33,7 +33,7 @@ class BraavoCategoryComponent extends BraavoComponent
     }
 
     if ($missingFields) {
-      return ['error' => 'Incomplete data. Missing fields: ' . implode(', ', $missingFields)];
+      return $this->returnError('Incomplete data. Missing fields: ' . implode(', ', $missingFields));
     }
 
     $page = 1;
@@ -49,7 +49,7 @@ class BraavoCategoryComponent extends BraavoComponent
       $response = $this->fetchAllBraavoCategory($body);
 
       if (isset($response['error'])) {
-        return $response;
+        return $this->returnError($response);
       }
 
       $extractIds = $this->extractCategoryIds($response);
@@ -63,7 +63,7 @@ class BraavoCategoryComponent extends BraavoComponent
     $result = $this->createParentCategory($parentName, $categoriesIds);
 
     if (isset($result['error'])) {
-      return $result;
+      return $this->returnError($result);
     }
 
     $categoryName = $data['name'];
@@ -81,7 +81,7 @@ class BraavoCategoryComponent extends BraavoComponent
       $response = $this->createCategory($categoryName, $parentId);
 
       if (isset($response['error'])) {
-        return $response;
+        return $this->returnError($response);
       }
 
       $result = $response;
@@ -92,13 +92,13 @@ class BraavoCategoryComponent extends BraavoComponent
       $response = $this->updateCategoryLink($categoryId, $parentId);
 
       if (isset($response['error'])) {
-        return $response;
+        return $this->returnError($response);
       }
 
       $result['updateLink'] = $response;
     }
 
-    return $result;
+    return $this->returnSuccess($result);
   }
 
   public function fetchAllBraavoCategory(array $body): array

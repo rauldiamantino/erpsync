@@ -21,7 +21,7 @@ class BraavoVariationComponent extends BraavoComponent
       $response = $this->fetchAllBraavoVariation($body);
 
       if (isset($response['error'])) {
-        return $response;
+        return $this->returnError($response);
       }
 
       $extractIds = $this->extractVariationIds($response);
@@ -45,13 +45,13 @@ class BraavoVariationComponent extends BraavoComponent
     $responseVar1Type = $this->createVariationType($variation1Type, $variationsIds);
 
     if (isset($responseVar1Type['error'])) {
-      return $responseVar1Type;
+      return $this->returnError($responseVar1Type);
     }
 
     $responseVar2Type = $this->createVariationType($variation2Type, $variationsIds);
 
     if (isset($responseVar2Type['error'])) {
-      return $responseVar2Type;
+      return $this->returnError($responseVar2Type);
     }
 
     $variation1TypeId = $responseVar1Type['id'] ?? '';
@@ -61,16 +61,16 @@ class BraavoVariationComponent extends BraavoComponent
     $responseVar1 = $this->createVariation($variation1Name, $variation1TypeId, $variationsIds);
 
     if (isset($responseVar1['error'])) {
-      return $responseVar1;
+      return $this->returnError($responseVar1);
     }
 
     $responseVar2 = $this->createVariation($variation2Name, $variation2TypeId, $variationsIds);
 
     if (isset($responseVar2['error'])) {
-      return $responseVar2;
+      return $this->returnError($responseVar2);
     }
 
-    return ['variation1Id' => $responseVar1['id'], 'variation2Id' => $responseVar2['id']];
+    return $this->returnSuccess(['variation1Id' => $responseVar1['id'], 'variation2Id' => $responseVar2['id']]);
   }
 
   private function fetchAllBraavoVariation(array $body): array

@@ -16,7 +16,6 @@
             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-24">Tipo</th>
             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-32">Serviço</th>
             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-40">Referência</th>
-            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-40">Status</th>
             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-40">Tentativas</th>
             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-[400px]">Dados</th>
             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-[400px]">Requisição</th>
@@ -32,7 +31,6 @@
               <td class="px-4 py-2 truncate w-24"><?php echo $value['type']; ?></td>
               <td class="px-4 py-2 truncate w-32"><?php echo $value['service']; ?></td>
               <td class="px-4 py-2 truncate w-40"><?php echo $value['reference_id']; ?></td>
-              <td class="px-4 py-2 truncate w-40"><?php echo $value['status']; ?></td>
               <td class="px-4 py-2 truncate w-40"><?php echo $value['attempts']; ?></td>
               <td class="px-4 py-2 align-top w-[400px]">
                 <div class="flex max-h-[150px] overflow-auto p-3 bg-gray-100 border border-gray-200 rounded text-xs font-mono whitespace-pre-wrap break-words">

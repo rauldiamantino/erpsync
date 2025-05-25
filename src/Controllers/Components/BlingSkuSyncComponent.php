@@ -10,13 +10,13 @@ class BlingSkuSyncComponent extends BlingComponent
   public function syncToEcommerce(int $id, array $dataTask): array
   {
     if (empty($id)) {
-      return ['error' => ['request_body' => [], 'response_body' => 'Empty sku ID']];
+      return $this->returnError('Empty sku ID');
     }
 
     $response = $this->fetchBlingSku($id);
 
     if (isset($response['error'])) {
-      return ['error' => ['request_body' => [], 'response_body' => $response['error']]];
+      return $this->returnError($response);
     }
 
     $sku = [
@@ -35,7 +35,7 @@ class BlingSkuSyncComponent extends BlingComponent
     ];
 
     if ($sku['format'] != 'S') {
-      return ['error' => ['request_body' => $sku, 'response_body' => 'Invalid format']];
+      return $this->returnError('Invalid format', $sku);
     }
 
     $braavoProductId = $dataTask['braavoProductId'] ?? '';
@@ -45,10 +45,10 @@ class BlingSkuSyncComponent extends BlingComponent
     $responsePlatform = $braavoComponent->sync($sku, $braavoProductId);
 
     if (isset($responsePlatform['error'])) {
-      return ['error' => ['request_body' => $responsePlatform['error']['payload'], 'response_body' => $responsePlatform['error']['response']]];
+      return $this->returnError($responsePlatform['error']['response_body'], $responsePlatform['error']['request_body']);
     }
 
-    return ['success' => ['request_body' => $responsePlatform['success']['payload'], 'response_body' => $responsePlatform['success']['response']]];
+    return $this->returnSuccess($responsePlatform['success']['response_body'], $responsePlatform['success']['request_body']);
   }
 
   private function parseVariations(array $data): array

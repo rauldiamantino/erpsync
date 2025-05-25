@@ -29,34 +29,34 @@ class BraavoProductComponent extends BraavoComponent
     $missingFields = $this->checkMissingFields($data);
 
     if (isset($missingFields['error'])) {
-      return ['error' => ['payload' => $data, 'response' => $missingFields['error']]];
+      return $this->returnError($missingFields, $data);
     }
 
     $productExists = $this->checkProductExists($data['code']);
 
     if (isset($productExists['error'])) {
-      return ['error' => ['payload' => $data, 'response' => $productExists['error']]];
+      return $this->returnError($productExists, $data);
     }
 
     if (isset($productExists['id'])) {
-      return ['error' => ['payload' => $data, 'response' => 'The product already exists']];
+      return $this->returnError('The product already exists', $data);
     }
 
     $payload = $this->preparePayload($data);
 
     if (isset($payload['error'])) {
-      return ['error' => ['payload' => $data, 'response' => $payload['error']]];
+      return $this->returnError($payload, $data);
     }
 
     $response = $this->createProduct($payload);
 
     if (isset($response['error'])) {
-      return ['error' => ['payload' => $payload, 'response' => $response['error']]];
+      return $this->returnError($response, $payload);
     }
 
     $this->scheduleSkusTasks($data, $response);
 
-    return ['success' => ['payload' => $payload, 'response' => $response]];
+    return $this->returnSuccess($response, $payload);
   }
 
   private function checkMissingFields(array $data): array

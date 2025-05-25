@@ -7,13 +7,9 @@ use App\Controllers\Components\BraavoComponent;
 
 class BraavoStockComponent extends BraavoComponent
 {
-  private $integrationTaskModel;
-
   public function __construct()
   {
     parent::__construct();
-
-    $this->integrationTaskModel = new IntegrationTaskModel();
   }
 
   public function sync(array $data, int $braavoSkuId): array
@@ -21,22 +17,22 @@ class BraavoStockComponent extends BraavoComponent
     $missingFields = $this->checkMissingFields($data);
 
     if (isset($missingFields['error'])) {
-      return ['error' => ['payload' => $data, 'response' => $missingFields['error']]];
+      return $this->returnError($missingFields, $data);
     }
 
     $payload = $this->preparePayload($data, $braavoSkuId);
 
     if (isset($payload['error'])) {
-      return ['error' => ['payload' => $data, 'response' => $payload['error']]];
+      return $this->returnError($payload, $data);
     }
 
     $response = $this->createStock($payload);
 
     if (isset($response['error'])) {
-      return ['error' => ['payload' => $payload, 'response' => $response['error']]];
+      return $this->returnError($response, $payload);
     }
 
-    return ['success' => ['payload' => $payload, 'response' => $response]];
+    return $this->returnSuccess($response, $payload);
   }
 
   private function checkMissingFields(array $data): array

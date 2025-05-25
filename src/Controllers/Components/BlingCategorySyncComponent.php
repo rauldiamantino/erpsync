@@ -15,13 +15,13 @@ class BlingCategorySyncComponent extends BlingComponent
   public function syncToEcommerce(int $id, array $data): array
   {
     if (empty($id)) {
-      return ['error' => ['request_body' => [], 'response_body' => 'Empty category ID']];
+      return $this->returnError('Empty category ID');
     }
 
     $response = $this->fetchBlingCategory($id);
 
     if (isset($response['error'])) {
-      return ['error' => ['request_body' => [], 'response_body' => $response['error']]];
+      return $this->returnError($response);
     }
 
     $category = [
@@ -34,7 +34,7 @@ class BlingCategorySyncComponent extends BlingComponent
     $response = $this->getParentCategoryName($category);
 
     if (isset($response['error'])) {
-      return ['error' => ['request_body' => $category, 'response_body' => $response['error']]];
+      return $this->returnError($response, $category);
     }
 
     $category['parentName'] = $response['descricao'] ?? '';
@@ -43,10 +43,10 @@ class BlingCategorySyncComponent extends BlingComponent
     $responsePlatform = $braavoComponent->sync($category);
 
     if (isset($responsePlatform['error'])) {
-      return ['error' => ['request_body' => $category, 'response_body' => $responsePlatform['error']]];
+      return $this->returnError($responsePlatform, $category);
     }
 
-    return ['success' => ['request_body' => $category, 'response_body' => $responsePlatform]];
+    return $this->returnSuccess($responsePlatform, $category);
   }
 
   private function fetchBlingCategory(int $id): array

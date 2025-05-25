@@ -10,13 +10,13 @@ class BlingProductSyncComponent extends BlingComponent
   public function syncToEcommerce(int $id, array $data): array
   {
     if (empty($id)) {
-      return ['error' => ['request_body' => [], 'response_body' => 'Empty product ID']];
+      return $this->returnError('Empty product ID');
     }
 
     $response = $this->fetchBlingProduct($id);
 
     if (isset($response['error'])) {
-      return ['error' => ['request_body' => [], 'response_body' => $response['error']]];
+      return $this->returnError($response);
     }
 
     $product = [
@@ -48,7 +48,7 @@ class BlingProductSyncComponent extends BlingComponent
       $responseCategoryName = $this->getCategoryName(intval($response['categoria']['id']));
 
       if (isset($responseCategoryName['error'])) {
-        return ['error' => ['request_body' => $product, 'response_body' => $responseCategoryName['error']]];
+        return $this->returnError($responseCategoryName, $product);
       }
 
       $product['categoryName'] = $responseCategoryName['categoryName'] ?? '';
@@ -95,10 +95,10 @@ class BlingProductSyncComponent extends BlingComponent
     $responsePlatform = $braavoComponent->sync($product);
 
     if (isset($responsePlatform['error'])) {
-      return ['error' => ['request_body' => $responsePlatform['error']['payload'], 'response_body' => $responsePlatform['error']['response']]];
+      return $this->returnError($responsePlatform['error']['response_body'], $responsePlatform['error']['request_body']);
     }
 
-    return ['success' => ['request_body' => $responsePlatform['success']['payload'], 'response_body' => $responsePlatform['success']['response']]];
+    return $this->returnSuccess($responsePlatform['success']['response_body'], $responsePlatform['success']['request_body']);
   }
 
   private function parseVariations(array $data): array

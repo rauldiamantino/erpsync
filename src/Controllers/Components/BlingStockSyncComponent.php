@@ -33,10 +33,10 @@ class BlingStockSyncComponent extends BlingComponent
     $responsePlatform = $braavoComponent->sync($stock, $braavoSkuId);
 
     if (isset($responsePlatform['error'])) {
-      return $this->returnError($responsePlatform['error']['response'], $responsePlatform['error']['payload']);
+      return $this->returnError($responsePlatform['error']['response_body'], $responsePlatform['error']['request_body']);
     }
 
-    return $this->returnSuccess($responsePlatform['success']['response'], $responsePlatform['success']['payload']);
+    return $this->returnSuccess($responsePlatform['success']['response_body'], $responsePlatform['success']['request_body']);
   }
 
   private function fetchBlingStock(int $id): array

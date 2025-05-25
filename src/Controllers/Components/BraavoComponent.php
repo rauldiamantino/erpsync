@@ -4,8 +4,9 @@ namespace App\Controllers\Components;
 
 use App\Classes\Config;
 use App\Classes\CurlRequest;
+use App\Controllers\Components\Component;
 
-class BraavoComponent
+class BraavoComponent extends Component
 {
   private string $baseUrl;
   private string $apiToken;

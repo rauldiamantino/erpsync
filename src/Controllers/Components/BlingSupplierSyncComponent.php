@@ -10,13 +10,13 @@ class BlingSupplierSyncComponent extends BlingComponent
   public function syncToEcommerce(int $id, array $data): array
   {
     if (empty($id)) {
-      return ['error' => ['request_body' => [], 'response_body' => 'Empty supplier ID']];
+      return $this->returnError('Empty supplier ID');
     }
 
     $response = $this->fetchBlingSupplier($id);
 
     if (isset($response['error'])) {
-      return ['error' => ['request_body' => [], 'response_body' => $response['error']]];
+      return $this->returnError($response);
     }
 
     $supplier = [
@@ -28,10 +28,10 @@ class BlingSupplierSyncComponent extends BlingComponent
     $responsePlatform = $braavoComponent->sync($supplier);
 
     if (isset($responsePlatform['error'])) {
-      return ['error' => ['request_body' => $supplier, 'response_body' => $responsePlatform['error']]];
+      return $this->returnError($responsePlatform, $supplier);
     }
 
-    return ['success' => ['request_body' => $supplier, 'response_body' => $responsePlatform]];
+    return $this->returnSuccess($responsePlatform, $supplier);
   }
 
   private function fetchBlingSupplier(int $id): array

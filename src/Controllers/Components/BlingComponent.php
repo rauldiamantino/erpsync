@@ -4,8 +4,9 @@ namespace App\Controllers\Components;
 
 use App\Classes\Config;
 use App\Classes\CurlRequest;
+use App\Controllers\Components\Component;
 
-class BlingComponent
+class BlingComponent extends Component
 {
   private string $baseUrl;
   private string $clientId;
@@ -22,20 +23,6 @@ class BlingComponent
     $this->accessToken = Config::get('bling_access_token');
     $this->refreshToken = Config::get('bling_refresh_token');
     $this->expiresToken = Config::get('bling_expires_in');
-  }
-
-  public function returnError($responseBody, $requestBody = []): array
-  {
-    if (isset($responseBody['error'])) {
-      $requestBody = $responseBody['error'];
-    }
-
-    return ['error' => ['request_body' => $requestBody, 'response_body' => $responseBody]];
-  }
-
-  public function returnSuccess($responseBody, $requestBody = []): array
-  {
-    return ['success' => ['request_body' => $requestBody, 'response_body' => $responseBody]];
   }
 
   public function sendRequest($method, $endpoint, $headers, $body = null, $queryParams = null)
