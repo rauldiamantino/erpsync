@@ -64,11 +64,12 @@ class IntegrationTasksController extends Controller
         ['url' => '/integration_tasks/receive_product/' . ServiceType::BLING, 'description' => 'Produtos'],
       ],
       TasksAction::SEND => [
-        ['url' => '/integration_tasks/send_category/' . ServiceType::BLING, 'description' => 'Categorias'],
-        ['url' => '/integration_tasks/send_supplier/' . ServiceType::BLING, 'description' => 'Fornecedores'],
-        ['url' => '/integration_tasks/send_product/' . ServiceType::BLING, 'description' => 'Produtos'],
-        ['url' => '/integration_tasks/send_sku/' . ServiceType::BLING, 'description' => 'Skus'],
-        ['url' => '/integration_tasks/send_all/' . ServiceType::BLING, 'description' => 'Todos'],
+        ['url' => '/integration_tasks/send/' . ReferenceType::CATEGORY, 'description' => 'Categorias'],
+        ['url' => '/integration_tasks/send/' . ReferenceType::SUPPLIER, 'description' => 'Fornecedores'],
+        ['url' => '/integration_tasks/send/' . ReferenceType::PRODUCT, 'description' => 'Produtos'],
+        ['url' => '/integration_tasks/send/' . ReferenceType::SKU, 'description' => 'Skus'],
+        ['url' => '/integration_tasks/send/' . ReferenceType::STOCK, 'description' => 'Estoques'],
+        ['url' => '/integration_tasks/send', 'description' => 'Todos'],
       ],
     ];
 
@@ -118,88 +119,19 @@ class IntegrationTasksController extends Controller
     }
   }
 
-  public function sendCategory(int $serviceType)
+  public function send(int $referenceType = 0)
   {
-    if ($serviceType === ServiceType::BLING) {
-      $result = (new SyncController())->sync(ReferenceType::CATEGORY);
+    $result = (new SyncController())->sync($referenceType);
 
-      $type = $result['type'] ?? 'error';
-      $taskId = $result['taskId'] ?? '';
-      $message = $result['message'] ?? '';
+    $taskId = $result['taskId'] ?? '';
+    $message = $result['message'] ?? '';
 
-      if ($taskId) {
-        $message = 'ID #' . $taskId . ' ' . $message;
-      }
-
-      return RedirectHelper::to('/integration_tasks', $type, $message);
+    if ($taskId) {
+      $message = 'ID #' . $taskId . ' ' . $message;
     }
-  }
 
-  public function sendSupplier(int $serviceType)
-  {
-    if ($serviceType === ServiceType::BLING) {
-      $result = (new SyncController())->sync(ReferenceType::SUPPLIER);
+    $type = $result['type'] ?? 'error';
 
-      $type = $result['type'] ?? 'error';
-      $taskId = $result['taskId'] ?? '';
-      $message = $result['message'] ?? '';
-
-      if ($taskId) {
-        $message = 'ID #' . $taskId . ' ' . $message;
-      }
-
-      return RedirectHelper::to('/integration_tasks', $type, $message);
-    }
-  }
-
-  public function sendProduct(int $serviceType)
-  {
-    if ($serviceType === ServiceType::BLING) {
-      $result = (new SyncController())->sync(ReferenceType::PRODUCT);
-
-      $type = $result['type'] ?? 'error';
-      $taskId = $result['taskId'] ?? '';
-      $message = $result['message'] ?? '';
-
-      if ($taskId) {
-        $message = 'ID #' . $taskId . ' ' . $message;
-      }
-
-      return RedirectHelper::to('/integration_tasks', $type, $message);
-    }
-  }
-
-  public function sendSku(int $serviceType)
-  {
-    if ($serviceType === ServiceType::BLING) {
-      $result = (new SyncController())->sync(ReferenceType::SKU);
-
-      $type = $result['type'] ?? 'error';
-      $taskId = $result['taskId'] ?? '';
-      $message = $result['message'] ?? '';
-
-      if ($taskId) {
-        $message = 'ID #' . $taskId . ' ' . $message;
-      }
-
-      return RedirectHelper::to('/integration_tasks', $type, $message);
-    }
-  }
-
-  public function sendAll(int $serviceType)
-  {
-    if ($serviceType === ServiceType::BLING) {
-      $result = (new SyncController())->sync();
-
-      $type = $result['type'] ?? 'error';
-      $taskId = $result['taskId'] ?? '';
-      $message = $result['message'] ?? '';
-
-      if ($taskId) {
-        $message = 'ID #' . $taskId . ' ' . $message;
-      }
-
-      return RedirectHelper::to('/integration_tasks', $type, $message);
-    }
+    return RedirectHelper::to('/integration_tasks', $type, $message);
   }
 }

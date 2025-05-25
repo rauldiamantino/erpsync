@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use App\Console\RouteCaller;
 
 if ($argc < 2) {
-  // php app/Console/callTasks.php controller/method/{id} 5
+  // php app/Console/callTasks.php controller/method 3
   echo "Usage: php callTasks.php <route_url> [interval_in_seconds]\n";
 
   exit(1);

@@ -24,6 +24,20 @@ class BlingComponent
     $this->expiresToken = Config::get('bling_expires_in');
   }
 
+  public function returnError($responseBody, $requestBody = []): array
+  {
+    if (isset($responseBody['error'])) {
+      $requestBody = $responseBody['error'];
+    }
+
+    return ['error' => ['request_body' => $requestBody, 'response_body' => $responseBody]];
+  }
+
+  public function returnSuccess($responseBody, $requestBody = []): array
+  {
+    return ['success' => ['request_body' => $requestBody, 'response_body' => $responseBody]];
+  }
+
   public function sendRequest($method, $endpoint, $headers, $body = null, $queryParams = null)
   {
     $renewToken = $this->renewToken();
