@@ -35,7 +35,12 @@ class SyncController extends Controller
     $resultTasks = $this->integrationTaskModel->findNextTask($referenceType);
 
     if (empty($resultTasks)) {
-      return ['neutral' => 'No records found'];
+      return [
+        'type' => 'neutral',
+        'attempt' => 0,
+        'message' => 'No records found',
+        'taskId' => null,
+      ];
     }
 
     $response = [];
@@ -67,6 +72,7 @@ class SyncController extends Controller
     if (empty($response)) {
       return [
         'type' => 'neutral',
+        'attempt' => 0,
         'message' => 'No records found',
         'taskId' => $resultTasks['id'],
       ];
@@ -81,6 +87,7 @@ class SyncController extends Controller
 
       return [
         'type' => 'error',
+        'attempt' => $resultTasks['attempts'] + 1,
         'message' => 'It was not possible to send the registration to the platform',
         'taskId' => $resultTasks['id'],
       ];
@@ -99,6 +106,7 @@ class SyncController extends Controller
 
     return [
       'type' => 'success',
+      'attempt' => $resultTasks['attempts'] + 1,
       'message' => 'Synchronized',
       'taskId' => $resultTasks['id'],
     ];

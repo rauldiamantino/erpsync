@@ -4,8 +4,10 @@ namespace App\Controllers;
 
 use App\Classes\Flash;
 use App\Helpers\TypeHelper;
+use App\Classes\CurlRequest;
 use App\Controllers\Controller;
 use App\Helpers\RedirectHelper;
+use App\Helpers\ConversionHelper;
 use App\Controllers\SyncController;
 use App\Models\IntegrationTaskModel;
 use App\Classes\Constants\ServiceType;
@@ -14,7 +16,6 @@ use App\Classes\Constants\ReferenceType;
 use App\Controllers\Components\BlingProductSchedulerComponent;
 use App\Controllers\Components\BlingCategorySchedulerComponent;
 use App\Controllers\Components\BlingSupplierSchedulerComponent;
-use App\Helpers\ConversionHelper;
 
 class IntegrationTasksController extends Controller
 {
@@ -119,19 +120,26 @@ class IntegrationTasksController extends Controller
     }
   }
 
-  public function send(int $referenceType = 0)
+  public function send(int $referenceType = 0): void
   {
     $result = (new SyncController())->sync($referenceType);
 
+    $type = $result['type'] ?? 'error';
     $taskId = $result['taskId'] ?? '';
+    $attempt = intval($result['attempt'] ?? 0);
     $message = $result['message'] ?? '';
 
-    if ($taskId) {
-      $message = 'ID #' . $taskId . ' ' . $message;
+    if (CurlRequest::getType() == 'script') {
+      $returnScript = [
+        'ID: ' => $taskId,
+        ucfirst($type) => $message,
+        'Attempt: ' => $attempt,
+      ];
+
+      echo ConversionHelper::arrayToJson($returnScript);
+      exit;
     }
 
-    $type = $result['type'] ?? 'error';
-
-    return RedirectHelper::to('/integration_tasks', $type, $message);
+    RedirectHelper::to('/integration_tasks', $type, $message);
   }
 }

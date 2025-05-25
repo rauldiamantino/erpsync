@@ -54,7 +54,7 @@ class IntegrationTaskModel extends Model
 
     $result = $this->executeQuery($sql, $data);
 
-    if (is_array($result)) {
+    if ($result and is_array($result)) {
       $result = $result[0];
     }
 

@@ -24,6 +24,15 @@ class CurlRequest
     return self::request('DELETE', $url, $headers);
   }
 
+  public static function getType(): string
+  {
+    if (isset($_SERVER['HTTP_X_REQUESTED_BY']) and $_SERVER['HTTP_X_REQUESTED_BY'] === 'CLI-Script') {
+      return 'script';
+    }
+
+    return '';
+  }
+
   private static function request(string $method, string $url, array $headers = [], $body = null, bool $isJson = true)
   {
     $ch = curl_init();
