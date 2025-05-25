@@ -13,12 +13,12 @@ class IntegrationTaskModel extends Model
     $this->setTable('integration_tasks');
   }
 
-  public function scheduleTask(int $type, int $service, int $reference_id): void
+  public function scheduleTask(int $type, int $service, int $referenceId): void
   {
     $data = [
       'type' => (int) $type,
       'service' => (int) $service,
-      'reference_id' => (int) $reference_id,
+      'reference_id' => (int) $referenceId,
       'attempts' => 0,
     ];
 

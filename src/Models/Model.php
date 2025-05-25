@@ -76,12 +76,12 @@ abstract class Model
     return $result;
   }
 
-  public function all(): array
+  public function all(string $orderBy = 'ASC'): array
   {
     $this->checkTable();
 
     $sql = <<<SQL
-  SELECT * FROM {$this->table}
+  SELECT * FROM {$this->table} ORDER BY `id` {$orderBy}
   SQL;
 
     $stmt = $this->database->query($sql);

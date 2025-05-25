@@ -9,6 +9,7 @@ use App\Classes\Constants\ServiceType;
 use App\Classes\Constants\ReferenceType;
 use App\Controllers\Components\BlingCategorySyncComponent;
 use App\Controllers\Components\BlingSupplierSyncComponent;
+use App\Controllers\Components\BlingProductSyncComponent;
 
 class SyncController extends Controller
 {
@@ -45,6 +46,10 @@ class SyncController extends Controller
 
     if ($resultTasks['service'] === ServiceType::BLING and $resultTasks['type'] === ReferenceType::SUPPLIER) {
       $response = (new BlingSupplierSyncComponent())->syncToEcommerce($resultTasks['reference_id']);
+    }
+
+    if ($resultTasks['service'] === ServiceType::BLING and $resultTasks['type'] === ReferenceType::PRODUCT) {
+      $response = (new BlingProductSyncComponent())->syncToEcommerce($resultTasks['reference_id']);
     }
 
     if (empty($response)) {

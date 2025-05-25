@@ -73,7 +73,7 @@ class BraavoSupplierComponent extends BraavoComponent
     return $result;
   }
 
-  private function fetchAllBraavoSupplier(array $body): array
+  public function fetchAllBraavoSupplier(array $body): array
   {
     $headers = [
       'Content-Type' => 'application/json',

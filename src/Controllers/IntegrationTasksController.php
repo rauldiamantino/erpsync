@@ -14,6 +14,7 @@ use App\Classes\Constants\ReferenceType;
 use App\Controllers\Components\BlingProductSchedulerComponent;
 use App\Controllers\Components\BlingCategorySchedulerComponent;
 use App\Controllers\Components\BlingSupplierSchedulerComponent;
+use App\Helpers\ConversionHelper;
 
 class IntegrationTasksController extends Controller
 {
@@ -39,6 +40,8 @@ class IntegrationTasksController extends Controller
     foreach ($integrationTasks as $key => $value):
       $integrationTasks[ $key ]['type'] = TypeHelper::getReferenceName($value['type']);
       $integrationTasks[ $key ]['service'] = TypeHelper::getServiceName($value['service']);
+      $integrationTasks[ $key ]['request_body'] = ConversionHelper::formatterJson($value['request_body']);
+      $integrationTasks[ $key ]['response_body'] = ConversionHelper::formatterJson($value['response_body']);
     endforeach;
 
     $this->view->assign('title', 'Integration Tasks');
@@ -149,7 +152,17 @@ class IntegrationTasksController extends Controller
   public function sendProduct(int $serviceType): void
   {
     if ($serviceType === ServiceType::BLING) {
-      RedirectHelper::to('/integration_tasks', 'success', 0 . ' products submitted');
+      $result = (new SyncController())->sync(ReferenceType::PRODUCT);
+
+      if (isset($result['error'])) {
+        RedirectHelper::to('/integration_tasks', 'error', $result['error']);
+      }
+
+      if (isset($result['neutral'])) {
+        RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
+      }
+
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] . ' products submitted');
     }
   }
 }

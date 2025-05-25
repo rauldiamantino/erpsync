@@ -3,9 +3,10 @@
 namespace App\Controllers;
 
 use App\Classes\Flash;
-use App\Models\IntegrationLogModel;
-use App\Controllers\Controller;
 use App\Helpers\TypeHelper;
+use App\Controllers\Controller;
+use App\Helpers\ConversionHelper;
+use App\Models\IntegrationLogModel;
 
 class IntegrationLogsController extends Controller
 {
@@ -23,14 +24,15 @@ class IntegrationLogsController extends Controller
 
   public function index(): void
   {
-    $integrationLogs = $this->integrationLogModel->all();
+    $orderBy = 'DESC';
+    $integrationLogs = $this->integrationLogModel->all($orderBy);
 
     foreach ($integrationLogs as $key => $value):
       $integrationLogs[ $key ]['type'] = TypeHelper::getReferenceName($value['type']);
       $integrationLogs[ $key ]['service_from'] = TypeHelper::getServiceName($value['service_from']);
       $integrationLogs[ $key ]['service_to'] = TypeHelper::getServiceName($value['service_to']);
-      $integrationLogs[ $key ]['request_body'] = $this->formatterJson($value['request_body']);
-      $integrationLogs[ $key ]['response_body'] = $this->formatterJson($value['response_body']);
+      $integrationLogs[ $key ]['request_body'] = ConversionHelper::formatterJson($value['request_body']);
+      $integrationLogs[ $key ]['response_body'] = ConversionHelper::formatterJson($value['response_body']);
     endforeach;
 
     $this->view->assign('title', 'Integration Logs');
@@ -39,11 +41,5 @@ class IntegrationLogsController extends Controller
     $this->view->assign('neutralMessage', Flash::get('neutral'));
     $this->view->assign('integrationLogs', $integrationLogs);
     $this->view->render('index');
-  }
-
-  public function formatterJson($json)
-  {
-    $array = json_decode($json);
-    return json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
   }
 }

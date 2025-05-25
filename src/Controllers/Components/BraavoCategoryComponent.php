@@ -101,7 +101,7 @@ class BraavoCategoryComponent extends BraavoComponent
     return $result;
   }
 
-  private function fetchAllBraavoCategory(array $body): array
+  public function fetchAllBraavoCategory(array $body): array
   {
     $headers = [
       'Content-Type' => 'application/json',
