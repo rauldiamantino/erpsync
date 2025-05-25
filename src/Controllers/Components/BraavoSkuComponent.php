@@ -3,6 +3,7 @@
 namespace App\Controllers\Components;
 
 use App\Models\IntegrationTaskModel;
+use App\Classes\Constants\ServiceType;
 use App\Classes\Constants\ReferenceType;
 use App\Controllers\Components\BraavoComponent;
 use App\Controllers\Components\BraavoVariationComponent;

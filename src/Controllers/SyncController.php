@@ -29,7 +29,7 @@ class SyncController extends Controller
     $this->integrationTaskModel = new IntegrationTaskModel();
   }
 
-  public function sync(int $referenceType)
+  public function sync(int $referenceType = 0)
   {
     $resultTasks = $this->integrationTaskModel->findNextTask($referenceType);
 

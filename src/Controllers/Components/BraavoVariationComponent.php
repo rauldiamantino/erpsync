@@ -102,7 +102,7 @@ class BraavoVariationComponent extends BraavoComponent
     $variationsIds = [];
     foreach ($response as $value):
       $id = $value['id'] ?? '';
-      $name = $value['nome'] ?? '';
+      $name = strtolower($value['nome'] ?? '');
       $parentId = $value['pai_id'] ?? '';
 
       if ($id and $name) {
@@ -119,8 +119,10 @@ class BraavoVariationComponent extends BraavoComponent
       return [];
     }
 
-    if (isset($variationsIds[ $variationType ]['parentId']) and $variationsIds[ $variationType ]['parentId'] == 0) {
-      return ['id' => $variationsIds[ $variationType ]['id'] ];
+    $nameVarTemp = strtolower($variationType);
+
+    if (isset($variationsIds[ $nameVarTemp ]['parentId']) and $variationsIds[ $nameVarTemp ]['parentId'] == 0) {
+      return ['id' => $variationsIds[ $nameVarTemp ]['id'] ];
     }
 
     $payload = [
@@ -144,8 +146,10 @@ class BraavoVariationComponent extends BraavoComponent
       return [];
     }
 
-    if (isset($variationsIds[ $variation ]['parentId']) and $variationsIds[ $variation ]['parentId'] == $variationTypeId) {
-      return ['id' => $variationsIds[ $variation ]['id'] ];
+    $nameVarTemp = strtolower($variation);
+
+    if (isset($variationsIds[ $nameVarTemp ]['parentId']) and $variationsIds[ $nameVarTemp ]['parentId'] == $variationTypeId) {
+      return ['id' => $variationsIds[ $nameVarTemp ]['id'] ];
     }
 
     $payload = [

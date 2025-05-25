@@ -68,6 +68,7 @@ class IntegrationTasksController extends Controller
         ['url' => '/integration_tasks/send_supplier/' . ServiceType::BLING, 'description' => 'Fornecedores'],
         ['url' => '/integration_tasks/send_product/' . ServiceType::BLING, 'description' => 'Produtos'],
         ['url' => '/integration_tasks/send_sku/' . ServiceType::BLING, 'description' => 'Skus'],
+        ['url' => '/integration_tasks/send_all/' . ServiceType::BLING, 'description' => 'Todos'],
       ],
     ];
 
@@ -182,6 +183,23 @@ class IntegrationTasksController extends Controller
       }
 
       RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] . ' skus submitted');
+    }
+  }
+
+  public function sendAll(int $serviceType): void
+  {
+    if ($serviceType === ServiceType::BLING) {
+      $result = (new SyncController())->sync();
+
+      if (isset($result['error'])) {
+        RedirectHelper::to('/integration_tasks', 'error', $result['error']);
+      }
+
+      if (isset($result['neutral'])) {
+        RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
+      }
+
+      RedirectHelper::to('/integration_tasks', 'success', $result['total_synchronized'] . ' items submitted');
     }
   }
 }

@@ -30,10 +30,16 @@ class IntegrationTaskModel extends Model
     $this->createOrUpdate($data);
   }
 
-  public function findNextTask(int $referenceType): mixed
+  public function findNextTask(int $referenceType = 0): mixed
   {
+    $typeWhere = '';
+
+    if ($referenceType) {
+      $typeWhere = '`type` = :type AND';
+    }
+
     $sql = <<<SQL
-  SELECT * FROM {$this->table} WHERE `type` = :type AND `attempts` < :attempts ORDER BY `id` ASC LIMIT :limit
+  SELECT * FROM {$this->table} WHERE {$typeWhere} `attempts` < :attempts ORDER BY `id` ASC LIMIT :limit
   SQL;
 
     $data = [
@@ -41,6 +47,10 @@ class IntegrationTaskModel extends Model
       ':attempts' => 3,
       ':limit' => 1,
     ];
+
+    if (empty($referenceType)) {
+      unset($data[':type']);
+    }
 
     $result = $this->executeQuery($sql, $data);
 

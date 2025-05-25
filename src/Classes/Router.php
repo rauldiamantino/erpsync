@@ -30,7 +30,7 @@ class Router
     $urlData = $this->parseUrl();
 
     $controllerName = $urlData['controller'];
-    $method = $urlData['method'];
+    $method = $this->formatMethodName($urlData['method']);
     $params = $urlData['params'];
     $routeKey = $urlData['routeKey'];
 
@@ -102,5 +102,17 @@ class Router
     $camelCase = str_replace(' ', '', ucwords(str_replace('_', ' ', $nome)));
 
     return $camelCase . 'Controller';
+  }
+
+  private function formatMethodName(string $nome): string
+  {
+    if (empty($nome)) {
+      return '';
+    }
+
+    $camelCase = str_replace(' ', '', ucwords(str_replace('_', ' ', $nome)));
+    $camelCase = lcfirst($camelCase);
+
+    return $camelCase;
   }
 }
