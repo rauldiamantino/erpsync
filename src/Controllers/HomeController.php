@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\Controller;
+use App\Helpers\RedirectHelper;
 
 class HomeController extends Controller
 {
@@ -16,6 +17,8 @@ class HomeController extends Controller
 
   public function index(): void
   {
+    RedirectHelper::to('/integration_tasks');
+
     $this->view->assign('title', 'Home');
     $this->view->render('index');
   }

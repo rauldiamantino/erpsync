@@ -7,7 +7,7 @@ use App\Helpers\ConversionHelper;
 
 class RedirectHelper
 {
-  public static function to(string $url, string $type, ?string $message = null)
+  public static function to(string $url, string $type = '', ?string $message = null)
   {
     if ($type and $message) {
       Flash::set($type, $message);
