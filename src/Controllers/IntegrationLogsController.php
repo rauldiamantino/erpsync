@@ -40,6 +40,7 @@ class IntegrationLogsController extends Controller
     $integrationLogs = $this->integrationLogModel->allPagination($currentPage, $perPage, $columns, 'DESC');
 
     $integrationLogsTotal = $this->integrationLogModel->count();
+    $this->view->assign('totalLogs', $integrationLogsTotal);
 
     $currentPage = max($currentPage, 1);
     $this->view->assign('currentPage', $currentPage);

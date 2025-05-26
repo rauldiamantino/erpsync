@@ -46,7 +46,9 @@ class IntegrationTasksController extends Controller
     ];
 
     $integrationTasks = $this->integrationTaskModel->allPagination($currentPage, $perPage, $columns);
+
     $integrationTasksTotal = $this->integrationTaskModel->count();
+    $this->view->assign('totalTasks', $integrationTasksTotal);
 
     $currentPage = max((int)$currentPage, 1);
     $this->view->assign('currentPage', $currentPage);
