@@ -17,17 +17,28 @@ class TypeHelper
     return $services[ $serviceType ] ?? 'Desconhecido';
   }
 
-  public static function getReferenceName(?int $referenceType): string
+  public static function getReferenceName(?int $referenceType, bool $plural = false): string
   {
     $referencesTypes = [
-      ReferenceType::PRODUCT => 'Produto',
+      ReferenceType::PRODUCT => 'Product',
       ReferenceType::SKU => 'Sku',
-      ReferenceType::CATEGORY => 'Categoria',
-      ReferenceType::BRAND => 'Marca',
-      ReferenceType::STOCK => 'Estoque',
-      ReferenceType::SUPPLIER => 'Fornecedor',
+      ReferenceType::CATEGORY => 'Category',
+      ReferenceType::BRAND => 'Brand',
+      ReferenceType::STOCK => 'Stock',
+      ReferenceType::SUPPLIER => 'Supplier',
     ];
 
-    return $referencesTypes[ $referenceType ] ?? 'Desconhecido';
+    if ($plural) {
+      $referencesTypes = [
+        ReferenceType::PRODUCT => 'Products',
+        ReferenceType::SKU => 'Skus',
+        ReferenceType::CATEGORY => 'Categories',
+        ReferenceType::BRAND => 'Brands',
+        ReferenceType::STOCK => 'Stocks',
+        ReferenceType::SUPPLIER => 'Suppliers',
+      ];
+    }
+
+    return $referencesTypes[ $referenceType ] ?? 'Unknown';
   }
 }

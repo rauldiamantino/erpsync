@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Helpers\TypeHelper;
 use App\Controllers\Controller;
 use App\Helpers\ConversionHelper;
 use App\Models\IntegrationLogModel;
@@ -13,6 +14,9 @@ use App\Controllers\Components\BlingStockSyncComponent;
 use App\Controllers\Components\BlingProductSyncComponent;
 use App\Controllers\Components\BlingCategorySyncComponent;
 use App\Controllers\Components\BlingSupplierSyncComponent;
+use App\Controllers\Components\BlingProductSchedulerComponent;
+use App\Controllers\Components\BlingCategorySchedulerComponent;
+use App\Controllers\Components\BlingSupplierSchedulerComponent;
 
 class SyncController extends Controller
 {
@@ -30,7 +34,7 @@ class SyncController extends Controller
     $this->integrationTaskModel = new IntegrationTaskModel();
   }
 
-  public function sync(int $referenceType = 0)
+  public function syncSend(int $referenceType = 0)
   {
     $resultTasks = $this->integrationTaskModel->findNextTask($referenceType);
 
@@ -109,6 +113,36 @@ class SyncController extends Controller
       'attempt' => $resultTasks['attempts'] + 1,
       'message' => 'Synchronized',
       'taskId' => $resultTasks['id'],
+    ];
+  }
+
+  public function syncReceive(int $referenceType): array
+  {
+    if ($referenceType === ReferenceType::CATEGORY) {
+      $response = (new BlingCategorySchedulerComponent($this->integrationTaskModel))->scheduleSync();
+    }
+
+    if ($referenceType === ReferenceType::SUPPLIER) {
+      $response = (new BlingSupplierSchedulerComponent($this->integrationTaskModel))->scheduleSync();
+    }
+
+    if ($referenceType === ReferenceType::PRODUCT) {
+      $response = (new BlingProductSchedulerComponent($this->integrationTaskModel))->scheduleSync();
+    }
+
+    $referenceName = TypeHelper::getReferenceName($referenceType, true);
+    $referenceName = strtolower($referenceName);
+
+    if (isset($response['error']) or ! isset($response['total_scheduled'])) {
+      return [
+        'type' => 'error',
+        'message' => 'Unable to receive ' . $referenceName,
+      ];
+    }
+
+    return [
+      'type' => 'success',
+      'message' => $response['total_scheduled'] . ' ' . $referenceName . ' reiceved',
     ];
   }
 }

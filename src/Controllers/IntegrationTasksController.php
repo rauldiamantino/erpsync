@@ -10,12 +10,8 @@ use App\Helpers\RedirectHelper;
 use App\Helpers\ConversionHelper;
 use App\Controllers\SyncController;
 use App\Models\IntegrationTaskModel;
-use App\Classes\Constants\ServiceType;
 use App\Classes\Constants\TasksAction;
 use App\Classes\Constants\ReferenceType;
-use App\Controllers\Components\BlingProductSchedulerComponent;
-use App\Controllers\Components\BlingCategorySchedulerComponent;
-use App\Controllers\Components\BlingSupplierSchedulerComponent;
 
 class IntegrationTasksController extends Controller
 {
@@ -36,14 +32,31 @@ class IntegrationTasksController extends Controller
     $receiveUrls = $this->getActionUrl(TasksAction::RECEIVE);
     $sendUrls = $this->getActionUrl(TasksAction::SEND);
 
-    $integrationTasks = $this->integrationTaskModel->all();
+    $perPage = 10;
+    $currentPage = intval($_GET['page'] ?? 1);
+
+    $columns = [
+      'id',
+      'type',
+      'reference_id',
+      'service',
+      'attempts',
+      'created_at',
+      'updated_at',
+    ];
+
+    $integrationTasks = $this->integrationTaskModel->allPagination($currentPage, $perPage, $columns);
+    $integrationTasksTotal = $this->integrationTaskModel->count();
+
+    $currentPage = max((int)$currentPage, 1);
+    $this->view->assign('currentPage', $currentPage);
+
+    $totalPages = (int) ceil($integrationTasksTotal / $perPage);
+    $this->view->assign('totalPages', $totalPages);
 
     foreach ($integrationTasks as $key => $value):
       $integrationTasks[ $key ]['type'] = TypeHelper::getReferenceName($value['type']);
       $integrationTasks[ $key ]['service'] = TypeHelper::getServiceName($value['service']);
-      $integrationTasks[ $key ]['data'] = ConversionHelper::formatterJson($value['data']);
-      $integrationTasks[ $key ]['request_body'] = ConversionHelper::formatterJson($value['request_body']);
-      $integrationTasks[ $key ]['response_body'] = ConversionHelper::formatterJson($value['response_body']);
     endforeach;
 
     $this->view->assign('title', 'Integration Tasks');
@@ -56,73 +69,66 @@ class IntegrationTasksController extends Controller
     $this->view->render('index');
   }
 
+  public function show(int $id)
+  {
+    $columns = [
+      'id',
+      'request_body',
+      'response_body',
+    ];
+
+    $integrationTask = $this->integrationTaskModel->find($id, $columns);
+
+    $id = $integrationTask['id'] ?? '';
+    $requestBody = $integrationTask['request_body'] ?? '';
+    $responseBody = $integrationTask['response_body'] ?? '';
+
+    $this->view->assign('title', 'Integration Task');
+    $this->view->assign('successMessage', Flash::get('success'));
+    $this->view->assign('errorMessage', Flash::get('error'));
+    $this->view->assign('neutralMessage', Flash::get('neutral'));
+    $this->view->assign('id', $id);
+    $this->view->assign('requestBody', ConversionHelper::formatterJson($requestBody));
+    $this->view->assign('responseBody', ConversionHelper::formatterJson($responseBody));
+    $this->view->render('task');
+  }
+
   private function getActionUrl(int $taskAction): array
   {
     $taskActionUrls = [
       TasksAction::RECEIVE => [
-        ['url' => '/integration_tasks/receive_category/' . ServiceType::BLING, 'description' => 'Categorias'],
-        ['url' => '/integration_tasks/receive_supplier/' . ServiceType::BLING, 'description' => 'Fornecedores'],
-        ['url' => '/integration_tasks/receive_product/' . ServiceType::BLING, 'description' => 'Produtos'],
+        ['url' => '/integration_tasks/receive/' . ReferenceType::CATEGORY, 'description' => 'Categories'],
+        ['url' => '/integration_tasks/receive/' . ReferenceType::SUPPLIER, 'description' => 'Suppliers'],
+        ['url' => '/integration_tasks/receive/' . ReferenceType::PRODUCT, 'description' => 'Products'],
       ],
       TasksAction::SEND => [
-        ['url' => '/integration_tasks/send/' . ReferenceType::CATEGORY, 'description' => 'Categorias'],
-        ['url' => '/integration_tasks/send/' . ReferenceType::SUPPLIER, 'description' => 'Fornecedores'],
-        ['url' => '/integration_tasks/send/' . ReferenceType::PRODUCT, 'description' => 'Produtos'],
-        ['url' => '/integration_tasks/send/' . ReferenceType::SKU, 'description' => 'Skus'],
-        ['url' => '/integration_tasks/send/' . ReferenceType::STOCK, 'description' => 'Estoques'],
-        ['url' => '/integration_tasks/send', 'description' => 'Todos'],
+        ['url' => '/integration_tasks/send/' . ReferenceType::CATEGORY, 'description' => 'Category'],
+        ['url' => '/integration_tasks/send/' . ReferenceType::SUPPLIER, 'description' => 'Supplier'],
+        ['url' => '/integration_tasks/send/' . ReferenceType::PRODUCT, 'description' => 'Product'],
+        ['url' => '/integration_tasks/send/' . ReferenceType::SKU, 'description' => 'Sku'],
+        ['url' => '/integration_tasks/send/' . ReferenceType::STOCK, 'description' => 'Stock'],
+        ['url' => '/integration_tasks/send', 'description' => 'Next'],
       ],
     ];
 
     return $taskActionUrls[ $taskAction ] ?? [];
   }
 
-  public function receiveCategory(int $serviceType)
+  public function receive(int $referenceType): void
   {
-    if ($serviceType === ServiceType::BLING) {
-      $result = (new BlingCategorySchedulerComponent($this->integrationTaskModel))->scheduleSync();
+    $syncController = new SyncController();
+    $result = $syncController->syncReceive($referenceType);
 
-      if (isset($result['error']) or ! isset($result['total_scheduled'])) {
-        return RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive categories');
-      }
+    $type = $result['type'] ?? 'error';
+    $message = $result['message'] ?? '';
 
-      return RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' categories reiceved');
-    }
-  }
-
-  public function receiveSupplier(int $serviceType)
-  {
-    if ($serviceType === ServiceType::BLING) {
-      $result = (new BlingSupplierSchedulerComponent($this->integrationTaskModel))->scheduleSync();
-
-      if (isset($result['error']) or ! isset($result['total_scheduled'])) {
-        return RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive suppliers');
-      }
-
-      return RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' suppliers reiceved');
-    }
-  }
-
-  public function receiveProduct(int $serviceType)
-  {
-    if ($serviceType === ServiceType::BLING) {
-      $result = (new BlingProductSchedulerComponent($this->integrationTaskModel))->scheduleSync();
-
-      if (isset($result['error']) or ! isset($result['total_scheduled'])) {
-        return RedirectHelper::to('/integration_tasks', 'error', 'Unable to receive products');
-      }
-
-      if (isset($result['neutral'])) {
-        return RedirectHelper::to('/integration_tasks', 'neutral', $result['neutral']);
-      }
-
-      return RedirectHelper::to('/integration_tasks', 'success', $result['total_scheduled'] . ' products received');
-    }
+    RedirectHelper::to('/integration_tasks', $type, $message);
   }
 
   public function send(int $referenceType = 0): void
   {
-    $result = (new SyncController())->sync($referenceType);
+    $syncController = new SyncController();
+    $result = $syncController->syncSend($referenceType);
 
     $type = $result['type'] ?? 'error';
     $taskId = $result['taskId'] ?? '';

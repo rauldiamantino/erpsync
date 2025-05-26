@@ -1,43 +1,38 @@
-<div class="min-w-full">
-  <section class="w-full flex justify-end px-2 py-3">
-    <a href="/integration_tasks" class="block w-max text-center text-gray-700 hover:underline" role="button" aria-label="Ver envios feitos">Ver agendamentos</a>
+<div class="mb-16 min-w-full p-4 sm:p-6 bg-white rounded-xl shadow-lg">
+  <section class="w-full flex justify-between items-center px-2 py-3 mb-4">
+    <h2 class="text-2xl font-bold text-gray-800">Integration Logs</h2>
+    <a href="/integration_tasks" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out" role="button" aria-label="Ver agendamentos">
+      View Schedules
+    </a>
   </section>
 
-  <div class="overflow-auto border border-gray-300 rounded-lg shadow-sm bg-white">
-    <table class="min-w-[1200px] w-full table-auto divide-y divide-gray-200">
-      <thead class="bg-gray-100 border-b border-gray-300">
+  <div class="overflow-x-auto">
+    <table class="min-w-[1400px] w-full table-auto divide-y divide-gray-300">
+      <thead class="bg-gray-50">
         <tr>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-16">ID</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-24">Tipo</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-32">Serviço (De)</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-32">Serviço (Para)</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-40">Referência</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-[400px]">Requisição</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-[400px]">Resposta</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-40">Criado</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-40">Atualizado</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-20">ID</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-32">Type</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-40">Service (From)</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-40">Service (To)</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-48">Reference</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-48">Created at</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-48">Updated at</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-200 text-gray-700 text-sm">
+      <tbody class="bg-white divide-y divide-gray-200 text-gray-700 text-sm">
         <?php foreach ($integrationLogs as $value): ?>
-          <tr class="hover:bg-gray-50 transition">
-            <td class="px-4 py-2 truncate w-16"><?php echo $value['id']; ?></td>
-            <td class="px-4 py-2 truncate w-24"><?php echo $value['type']; ?></td>
-            <td class="px-4 py-2 truncate w-32"><?php echo $value['service_from']; ?></td>
-            <td class="px-4 py-2 truncate w-32"><?php echo $value['service_to']; ?></td>
-            <td class="px-4 py-2 truncate w-40"><?php echo $value['reference_id']; ?></td>
-            <td class="px-4 py-2 align-top w-[400px]">
-              <div class="flex max-h-[150px] overflow-auto p-3 bg-gray-100 border border-gray-200 rounded text-xs font-mono whitespace-pre-wrap break-words">
-                <pre class="whitespace-pre-wrap break-all"><?php echo htmlspecialchars($value['request_body']); ?></pre>
-              </div>
+          <tr class="hover:bg-gray-100 transition duration-150 ease-in-out">
+            <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+              <a href="/integration_logs/show/<?php echo $value['id'] . '?referer=' . urlencode($_SERVER['REQUEST_URI']); ?>" class="underline">
+                <?php echo $value['id']; ?>
+              </a>
             </td>
-            <td class="px-4 py-2 truncate align-top w-[400px]">
-              <div class="flex max-h-[150px] overflow-auto p-3 bg-gray-100 border border-gray-200 rounded text-xs font-mono whitespace-pre-wrap break-words">
-                <pre class="whitespace-pre-wrap break-all"><?php echo htmlspecialchars($value['response_body']); ?></pre>
-              </div>
-            </td>
-            <td class="px-4 py-2 truncate w-40 truncate"><?php echo $value['created_at']; ?></td>
-            <td class="px-4 py-2 truncate w-40 truncate"><?php echo $value['updated_at']; ?></td>
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600"><?php echo $value['type']; ?></td>
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600"><?php echo $value['service_from']; ?></td>
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600"><?php echo $value['service_to']; ?></td>
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600"><?php echo $value['reference_id']; ?></td>
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600"><?php echo $value['created_at']; ?></td>
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600"><?php echo $value['updated_at']; ?></td>
           </tr>
         <?php endforeach; ?>
       </tbody>
