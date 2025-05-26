@@ -27,27 +27,26 @@ abstract class Model
     }
   }
 
-  public function find(int $id): ?array
+  public function find(int $id, array $columns = ['*']): ?array
   {
     $this->checkTable();
 
+    $columnsList = implode(', ', $columns);
+
     $sql = <<<SQL
-  SELECT * FROM {$this->table} WHERE id = :id LIMIT 1
+  SELECT {$columnsList} FROM {$this->table} WHERE id = :id LIMIT 1
   SQL;
 
-    $data = [':id' => $id];
+    $data = [':id' => (int) $id];
     $stmt = $this->database->prepare($sql);
     $stmt->execute($data);
     $stmt->setFetchMode(PDO::FETCH_ASSOC);
 
     $result = $stmt->fetch();
 
-    if ($result === false) {
-        return null;
-    }
-
-    return $result;
+    return $result !== false ? $result : null;
   }
+
 
   public function findBy(string $field, mixed $value, int $limit = 1): ?array
   {
@@ -76,18 +75,64 @@ abstract class Model
     return $result;
   }
 
-  public function all(string $orderBy = 'ASC'): array
+  public function all(string $sortDirection = 'ASC', array $columns = ['*']): array
   {
     $this->checkTable();
 
+    $sortDirection = strtoupper($sortDirection);
+
+    if (! in_array($sortDirection, ['ASC', 'DESC'])) {
+      $sortDirection = 'ASC';
+    }
+
+    $columnsList = implode(', ', $columns);
+
     $sql = <<<SQL
-  SELECT * FROM {$this->table} ORDER BY `id` {$orderBy}
+  SELECT {$columnsList} FROM {$this->table} ORDER BY `id` {$sortDirection}
   SQL;
 
     $stmt = $this->database->query($sql);
     $stmt->setFetchMode(PDO::FETCH_ASSOC);
 
     return $stmt->fetchAll();
+  }
+
+  public function allPagination(int $page, int $perPage, array $columns = ['*'], string $sortDirection = 'ASC'): array
+  {
+    $this->checkTable();
+
+    $sortDirection = strtoupper($sortDirection);
+
+    if (! in_array($sortDirection, ['ASC', 'DESC'])) {
+      $sortDirection = 'ASC';
+    }
+
+    $columnsList = implode(', ', $columns);
+
+    $offset = ($page - 1) * $perPage;
+
+    $sql = <<<SQL
+  SELECT {$columnsList} FROM {$this->table} ORDER BY `id` {$sortDirection} LIMIT {$offset}, {$perPage}
+  SQL;
+
+    $stmt = $this->database->query($sql);
+    $stmt->setFetchMode(PDO::FETCH_ASSOC);
+
+    return $stmt->fetchAll();
+  }
+
+  public function count(): int
+  {
+    $this->checkTable();
+
+    $sql = <<<SQL
+  SELECT COUNT(*) AS total FROM {$this->table};
+  SQL;
+
+    $stmt = $this->database->query($sql);
+    $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return (int) $resultado['total'];
   }
 
   public function create(array $data): bool

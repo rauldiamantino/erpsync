@@ -24,15 +24,33 @@ class IntegrationLogsController extends Controller
 
   public function index(): void
   {
-    $orderBy = 'DESC';
-    $integrationLogs = $this->integrationLogModel->all($orderBy);
+    $perPage = 10;
+    $currentPage = intval($_GET['page'] ?? 1);
+
+    $columns = [
+      'id',
+      'type',
+      'service_from',
+      'service_to',
+      'reference_id',
+      'created_at',
+      'updated_at',
+    ];
+
+    $integrationLogs = $this->integrationLogModel->allPagination($currentPage, $perPage, $columns, 'DESC');
+
+    $integrationLogsTotal = $this->integrationLogModel->count();
+
+    $currentPage = max($currentPage, 1);
+    $this->view->assign('currentPage', $currentPage);
+
+    $totalPages = (int) ceil($integrationLogsTotal / $perPage);
+    $this->view->assign('totalPages', $totalPages);
 
     foreach ($integrationLogs as $key => $value):
       $integrationLogs[ $key ]['type'] = TypeHelper::getReferenceName($value['type']);
       $integrationLogs[ $key ]['service_from'] = TypeHelper::getServiceName($value['service_from']);
       $integrationLogs[ $key ]['service_to'] = TypeHelper::getServiceName($value['service_to']);
-      $integrationLogs[ $key ]['request_body'] = ConversionHelper::formatterJson($value['request_body']);
-      $integrationLogs[ $key ]['response_body'] = ConversionHelper::formatterJson($value['response_body']);
     endforeach;
 
     $this->view->assign('title', 'Integration Logs');
@@ -41,5 +59,29 @@ class IntegrationLogsController extends Controller
     $this->view->assign('neutralMessage', Flash::get('neutral'));
     $this->view->assign('integrationLogs', $integrationLogs);
     $this->view->render('index');
+  }
+
+  public function show(int $id)
+  {
+    $columns = [
+      'id',
+      'request_body',
+      'response_body',
+    ];
+
+    $integrationLog = $this->integrationLogModel->find($id, $columns);
+
+    $id = $integrationLog['id'] ?? '';
+    $requestBody = $integrationLog['request_body'] ?? '';
+    $responseBody = $integrationLog['response_body'] ?? '';
+
+    $this->view->assign('title', 'Integration Log');
+    $this->view->assign('successMessage', Flash::get('success'));
+    $this->view->assign('errorMessage', Flash::get('error'));
+    $this->view->assign('neutralMessage', Flash::get('neutral'));
+    $this->view->assign('id', $id);
+    $this->view->assign('requestBody', ConversionHelper::formatterJson($requestBody));
+    $this->view->assign('responseBody', ConversionHelper::formatterJson($responseBody));
+    $this->view->render('log');
   }
 }
