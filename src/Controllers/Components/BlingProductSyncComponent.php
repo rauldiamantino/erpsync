@@ -77,7 +77,7 @@ class BlingProductSyncComponent extends BlingComponent
       $product['skus'] = [
         [
           'id' => $product['id'],
-          'code' => $product['codigo'],
+          'code' => $product['code'],
           'salePrice' => $product['price'],
           'costPrice' => 0,
           'stock' => $product['stock'],
