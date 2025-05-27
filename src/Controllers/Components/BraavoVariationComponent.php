@@ -57,6 +57,9 @@ class BraavoVariationComponent extends BraavoComponent
     $variation1TypeId = $responseVar1Type['id'] ?? '';
     $variation2TypeId = $responseVar2Type['id'] ?? '';
 
+    $variation1TypeId = (int) $variation1TypeId;
+    $variation2TypeId = (int) $variation2TypeId;
+
     // Variation ID
     $responseVar1 = $this->createVariation($variation1Name, $variation1TypeId, $variationsIds);
 
@@ -70,7 +73,7 @@ class BraavoVariationComponent extends BraavoComponent
       return $this->returnError($responseVar2);
     }
 
-    return $this->returnSuccess(['variation1Id' => $responseVar1['id'], 'variation2Id' => $responseVar2['id']]);
+    return $this->returnSuccess(['variation1Id' => $responseVar1['id'] ?? 0, 'variation2Id' => $responseVar2['id'] ?? 0]);
   }
 
   private function fetchAllBraavoVariation(array $body): array
@@ -106,7 +109,7 @@ class BraavoVariationComponent extends BraavoComponent
       $parentId = $value['pai_id'] ?? '';
 
       if ($id and $name) {
-        $variationsIds[ $name ] = ['id' => (int) $id, 'parentId' => (int) $parentId];
+        $variationsIds[ $name ][] = ['id' => (int) $id, 'parentId' => (int) $parentId];
       }
     endforeach;
 
@@ -119,11 +122,23 @@ class BraavoVariationComponent extends BraavoComponent
       return [];
     }
 
-    $nameVarTemp = strtolower($variationType);
+    foreach ($variationsIds as $keyVariationsIds => $valueVariationsIds):
 
-    if (isset($variationsIds[ $nameVarTemp ]['parentId']) and $variationsIds[ $nameVarTemp ]['parentId'] == 0) {
-      return ['id' => $variationsIds[ $nameVarTemp ]['id'] ];
-    }
+      if ($keyVariationsIds != strtolower($variationType)) {
+        continue;
+      }
+
+      foreach ($valueVariationsIds as $value):
+
+        if (! isset($value['id']) or empty($value['id'])) {
+          continue;
+        }
+
+        if (! isset($value['parentId']) or empty($value['parentId'])) {
+          return ['id' => $value['id']];
+        }
+      endforeach;
+    endforeach;
 
     $payload = [
       'pai_id' => '0',
@@ -146,11 +161,23 @@ class BraavoVariationComponent extends BraavoComponent
       return [];
     }
 
-    $nameVarTemp = strtolower($variation);
+    foreach ($variationsIds as $keyVariationsIds => $valueVariationsIds):
 
-    if (isset($variationsIds[ $nameVarTemp ]['parentId']) and $variationsIds[ $nameVarTemp ]['parentId'] == $variationTypeId) {
-      return ['id' => $variationsIds[ $nameVarTemp ]['id'] ];
-    }
+      if ($keyVariationsIds != strtolower($variation)) {
+        continue;
+      }
+
+      foreach ($valueVariationsIds as $value):
+
+        if (! isset($value['id']) or empty($value['id'])) {
+          continue;
+        }
+
+        if (isset($value['parentId']) and $value['parentId'] == $variationTypeId) {
+          return ['id' => $value['id']];
+        }
+      endforeach;
+    endforeach;
 
     $payload = [
       'pai_id' => (string) $variationTypeId,
