@@ -148,6 +148,7 @@ class IntegrationTasksController extends Controller
         'Type: ' => $referenceType,
         'Service From: ' => $serviceFrom,
         'Service To: ' => $serviceTo,
+        'Date:' => date('y-m-d H:i:s'),
       ];
 
       echo ConversionHelper::arrayToJson($returnScript);
