@@ -140,8 +140,8 @@ class BraavoSkuComponent extends BraavoComponent
       return $response;
     }
 
-    $payload['var1_id'] = strval($response['success']['variation1Id'] ?? 0);
-    $payload['var2_id'] = strval($response['success']['variation2Id'] ?? 0);
+    $payload['var1_id'] = strval($response['success']['response_body']['variation1Id'] ?? 0);
+    $payload['var2_id'] = strval($response['success']['response_body']['variation2Id'] ?? 0);
 
     // Status
     if (strtoupper($data['status']) == 'A') {
