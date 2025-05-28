@@ -136,12 +136,18 @@ class IntegrationTasksController extends Controller
     $taskId = $result['taskId'] ?? '';
     $attempt = intval($result['attempt'] ?? 0);
     $message = $result['message'] ?? '';
+    $referenceType = $result['referenceType'] ?? '';
+    $serviceFrom = $result['serviceFrom'] ?? '';
+    $serviceTo = $result['serviceTo'] ?? '';
 
     if (CurlRequest::getType() == 'script') {
       $returnScript = [
         'ID: ' => $taskId,
         ucfirst($type) => $message,
         'Attempt: ' => $attempt,
+        'Type: ' => $referenceType,
+        'Service From: ' => $serviceFrom,
+        'Service To: ' => $serviceTo,
       ];
 
       echo ConversionHelper::arrayToJson($returnScript);

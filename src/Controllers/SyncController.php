@@ -79,6 +79,9 @@ class SyncController extends Controller
         'attempt' => 0,
         'message' => 'No records found',
         'taskId' => $resultTasks['id'],
+        'referenceType' => TypeHelper::getReferenceName($resultTasks['type']),
+        'serviceFrom' => TypeHelper::getServiceName($resultTasks['service']),
+        'serviceTo' => TypeHelper::getServiceName($serviceTo),
       ];
     }
 
@@ -94,6 +97,9 @@ class SyncController extends Controller
         'attempt' => $resultTasks['attempts'] + 1,
         'message' => 'It was not possible to send the registration to the platform',
         'taskId' => $resultTasks['id'],
+        'referenceType' => TypeHelper::getReferenceName($resultTasks['type']),
+        'serviceFrom' => TypeHelper::getServiceName($resultTasks['service']),
+        'serviceTo' => TypeHelper::getServiceName($serviceTo),
       ];
     }
 
@@ -113,6 +119,9 @@ class SyncController extends Controller
       'attempt' => $resultTasks['attempts'] + 1,
       'message' => 'Synchronized',
       'taskId' => $resultTasks['id'],
+      'referenceType' => TypeHelper::getReferenceName($resultTasks['type']),
+      'serviceFrom' => TypeHelper::getServiceName($resultTasks['service']),
+      'serviceTo' => TypeHelper::getServiceName($serviceTo),
     ];
   }
 
