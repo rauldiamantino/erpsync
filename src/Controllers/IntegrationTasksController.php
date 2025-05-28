@@ -71,6 +71,13 @@ class IntegrationTasksController extends Controller
     $this->view->render('index');
   }
 
+  public function delete(int $id)
+  {
+    $this->integrationTaskModel->delete($id);
+
+    RedirectHelper::to('/integration_tasks', 'success', 'Registration removed');
+  }
+
   public function show(int $id)
   {
     $columns = [
