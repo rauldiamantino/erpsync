@@ -9,7 +9,11 @@ use App\Helpers\ElementHelper; ?>
     <section class="w-full flex justify-between items-center px-2 py-3 mb-4">
       <div>
         <h2 class="text-2xl font-bold text-gray-800">Integration Tasks</h2>
-        <span class="text-md text-gray-600">Total Records: <?php echo $totalTasks; ?></span>
+        <div class="flex flex-col font-light">
+          <span class="text-md text-gray-600">Total records: <?php echo $totalTasks; ?></span>
+          <span class="text-md text-gray-600">Total pages: <?php echo $totalPages; ?></span>
+          <span class="text-md text-gray-600">Current page: <?php echo $currentPage; ?></span>
+        </div>
       </div>
       <a href="/integration_logs" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out" role="button" aria-label="Ver envios feitos">
         View Completed Requests
