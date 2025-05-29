@@ -188,7 +188,12 @@ abstract class Model
   SQL;
 
     $stmt = $this->database->prepare($sql);
-    return $stmt->execute($data);
+
+    if ($stmt->execute($data)) {
+      return $stmt->rowCount() > 0;
+    }
+
+    return false;
   }
 
   public function update(int $id, array $data): bool
@@ -209,7 +214,11 @@ abstract class Model
     $data['id'] = $id;
     $stmt = $this->database->prepare($sql);
 
-    return $stmt->execute($data);
+    if ($stmt->execute($data)) {
+      return $stmt->rowCount() > 0;
+    }
+
+    return false;
   }
 
   public function delete(int $id): bool
@@ -223,7 +232,29 @@ abstract class Model
     $data = [':id' => $id];
     $stmt = $this->database->prepare($sql);
 
-    return $stmt->execute($data);
+    if ($stmt->execute($data)) {
+      return $stmt->rowCount() > 0;
+    }
+
+    return false;
+  }
+
+  public function deleteBy(string $field, mixed $value): bool
+  {
+    $this->checkTable();
+
+    $sql = <<<SQL
+  DELETE FROM {$this->table} WHERE {$field} = :value
+  SQL;
+
+    $data = [':value' => $value];
+    $stmt = $this->database->prepare($sql);
+
+    if ($stmt->execute($data)) {
+      return $stmt->rowCount() > 0;
+    }
+
+    return false;
   }
 
   /**

@@ -31,6 +31,7 @@ class IntegrationTasksController extends Controller
   {
     $receiveUrls = $this->getActionUrl(TasksAction::RECEIVE);
     $sendUrls = $this->getActionUrl(TasksAction::SEND);
+    $deleteUrls = $this->getActionUrl(TasksAction::DELETE);
 
     $perPage = 10;
     $currentPage = intval($_GET['page'] ?? 1);
@@ -67,15 +68,27 @@ class IntegrationTasksController extends Controller
     $this->view->assign('neutralMessage', Flash::get('neutral'));
     $this->view->assign('receiveUrls', $receiveUrls);
     $this->view->assign('sendUrls', $sendUrls);
+    $this->view->assign('deleteUrls', $deleteUrls);
     $this->view->assign('integrationTasks', $integrationTasks);
     $this->view->render('index');
   }
 
-  public function delete(int $id)
+  public function delete(int $id = 0)
   {
     $this->integrationTaskModel->delete($id);
 
     RedirectHelper::to('/integration_tasks', 'success', 'Registration removed');
+  }
+
+  public function deleteByReferenceType(int $id): void
+  {
+    $id = (int) $id;
+
+    if ($this->integrationTaskModel->deleteBy('type', $id)) {
+      RedirectHelper::to('/integration_tasks', 'success', 'Registration removed');
+    }
+
+    RedirectHelper::to('/integration_tasks', 'neutral', 'No records found');
   }
 
   public function show(int $id)
@@ -117,6 +130,13 @@ class IntegrationTasksController extends Controller
         ['url' => '/integration_tasks/send/' . ReferenceType::SKU, 'description' => 'Sku'],
         ['url' => '/integration_tasks/send/' . ReferenceType::STOCK, 'description' => 'Stock'],
         ['url' => '/integration_tasks/send', 'description' => 'Next'],
+      ],
+      TasksAction::DELETE => [
+        ['url' => '/integration_tasks/delete_reference/' . ReferenceType::CATEGORY, 'description' => 'Category'],
+        ['url' => '/integration_tasks/delete_reference/' . ReferenceType::SUPPLIER, 'description' => 'Supplier'],
+        ['url' => '/integration_tasks/delete_reference/' . ReferenceType::PRODUCT, 'description' => 'Product'],
+        ['url' => '/integration_tasks/delete_reference/' . ReferenceType::SKU, 'description' => 'Sku'],
+        ['url' => '/integration_tasks/delete_reference/' . ReferenceType::STOCK, 'description' => 'Stock'],
       ],
     ];
 
